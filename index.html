@@ -7,7 +7,7 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preload" href="assets/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="assets/fonts/ibm-plex-sans/IBMPlexSans-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -33,6 +33,7 @@
       <section id="dropZone" class="drop-zone" aria-label="Audio file upload" data-i18n-aria="audioFileUpload">
         <div class="drop-copy">
           <strong data-i18n="dropAudio">Drop an audio file here</strong>
+          <p class="privacy-note" data-i18n="privacyNote">Your file stays private, local, and is not uploaded.</p>
           <button id="dropOpenButton" type="button" data-i18n="openAudio">Open audio</button>
         </div>
       </section>
@@ -68,7 +69,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 5v14l8-7zM14 5v14h3V5z"></path>
               </svg>
-              <span data-i18n="nextSound">Next sound</span>
+              <span data-i18n="nextSound">Next section</span>
             </button>
             <div class="jump-control" aria-label="Timed jump controls" data-i18n-aria="timedJumpControls">
               <button id="jumpBack" type="button" class="icon-button" aria-label="Jump backward" data-i18n-aria="jumpBackward">
