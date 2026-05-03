@@ -15,16 +15,40 @@
       <header class="app-header">
         <p class="app-title">SectionFinder</p>
         <div class="header-actions">
-          <label class="language-control">
+          <div class="language-control">
+            <span class="material-symbols-sharp ui-icon" aria-hidden="true">language</span>
             <span class="sr-only" data-i18n="language">Language</span>
-            <select id="languageSelect" aria-label="Language">
-              <option value="en" selected>English</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="zh-TW" hidden>繁體中文</option>
-            </select>
-          </label>
+            <button
+              id="languageSelect"
+              type="button"
+              class="language-button"
+              value="en"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="languageMenu"
+              aria-label="Language"
+              data-i18n-aria="language"
+            >
+              <span class="language-value">English</span>
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">expand_more</span>
+            </button>
+            <div id="languageMenu" class="custom-menu language-menu is-hidden" role="listbox" aria-label="Language">
+              <button type="button" role="option" data-value="en" aria-selected="true">English</button>
+              <button type="button" role="option" data-value="es">Español</button>
+              <button type="button" role="option" data-value="fr">Français</button>
+              <button type="button" role="option" data-value="de">Deutsch</button>
+              <button type="button" role="option" data-value="pt-BR">Português (Brasil)</button>
+              <button type="button" role="option" data-value="ru">Русский</button>
+              <button type="button" role="option" data-value="hi">हिन्दी</button>
+              <button type="button" role="option" data-value="ja">日本語</button>
+              <button type="button" role="option" data-value="ko">한국어</button>
+              <button type="button" role="option" data-value="zh-CN">简体中文</button>
+              <button type="button" role="option" data-value="zh-TW">繁體中文</button>
+            </div>
+          </div>
           <label class="file-button">
             <input id="fileInput" type="file" accept="audio/*">
+            <span class="material-symbols-sharp ui-icon" aria-hidden="true">audio_file</span>
             <span data-i18n="openAudio">Open audio</span>
           </label>
         </div>
@@ -34,7 +58,11 @@
         <div class="drop-copy">
           <strong data-i18n="dropAudio">Drop an audio file here</strong>
           <p class="privacy-note" data-i18n="privacyNote">Your file stays private, local, and is not uploaded.</p>
-          <button id="dropOpenButton" type="button" data-i18n="openAudio">Open audio</button>
+          <p class="format-note" data-i18n="supportedFormats">Supports MP3, WAV, M4A, AAC, OGG, and FLAC.</p>
+          <button id="dropOpenButton" type="button">
+            <span class="material-symbols-sharp ui-icon" aria-hidden="true">audio_file</span>
+            <span data-i18n="openAudio">Open audio</span>
+          </button>
         </div>
       </section>
 
@@ -60,54 +88,64 @@
         <div class="controls-grid">
           <div class="control-row transport-row">
             <button id="playButton" type="button" class="icon-button primary-control" aria-label="Play">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 5v14l11-7z"></path>
-              </svg>
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">play_arrow</span>
               <span data-i18n="play">Play</span>
             </button>
             <button id="nextAudio" type="button" class="icon-button">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 5v14l8-7zM14 5v14h3V5z"></path>
-              </svg>
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">skip_next</span>
               <span data-i18n="nextSound">Next section</span>
             </button>
             <div class="jump-control" aria-label="Timed jump controls" data-i18n-aria="timedJumpControls">
               <button id="jumpBack" type="button" class="icon-button" aria-label="Jump backward" data-i18n-aria="jumpBackward">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11 18V6l-8.5 6zM20 18V6l-8.5 6z"></path>
-                </svg>
+                <span class="material-symbols-sharp ui-icon" aria-hidden="true">fast_rewind</span>
               </button>
-              <select id="jumpAmount" aria-label="Jump amount" data-i18n-aria="jumpAmount">
-                <option value="5">5s</option>
-                <option value="10" selected>10s</option>
-                <option value="30">30s</option>
-                <option value="60">60s</option>
-              </select>
+              <div class="jump-amount-wrap">
+                <button
+                  id="jumpAmount"
+                  type="button"
+                  class="jump-amount-button"
+                  value="10"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="jumpAmountMenu"
+                  aria-label="Jump amount"
+                  data-i18n-aria="jumpAmount"
+                >
+                  <span class="jump-amount-value">10s</span>
+                </button>
+                <div id="jumpAmountMenu" class="custom-menu jump-amount-menu is-hidden" role="listbox" aria-label="Jump amount" data-i18n-aria="jumpAmount">
+                  <button type="button" role="option" data-value="5">5s</button>
+                  <button type="button" role="option" data-value="10" aria-selected="true">10s</button>
+                  <button type="button" role="option" data-value="30">30s</button>
+                  <button type="button" role="option" data-value="60">60s</button>
+                </div>
+              </div>
               <button id="jumpForward" type="button" class="icon-button" aria-label="Jump forward" data-i18n-aria="jumpForward">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M13 6v12l8.5-6zM4 6v12l8.5-6z"></path>
-                </svg>
+                <span class="material-symbols-sharp ui-icon" aria-hidden="true">fast_forward</span>
               </button>
             </div>
-          </div>
-
-          <div class="control-row settings-row">
             <div class="volume-control">
-              <label for="volumeSlider" data-i18n="volume">Volume</label>
+              <label for="volumeSlider">
+                <span class="material-symbols-sharp ui-icon" aria-hidden="true">volume_up</span>
+                <span class="sr-only" data-i18n="volume">Volume</span>
+              </label>
               <input id="volumeSlider" type="range" min="0" max="300" step="10" value="100" data-i18n-aria="volume">
               <output id="volumeValue" for="volumeSlider">100%</output>
             </div>
             <label class="speed-control">
-              <span data-i18n="speed">Speed</span>
+              <span class="control-label">
+                <span class="material-symbols-sharp ui-icon" aria-hidden="true">speed</span>
+                <span class="sr-only" data-i18n="speed">Speed</span>
+              </span>
               <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" data-i18n-aria="speed">
-              <output id="speedValue" for="speedSlider">1x</output>
+              <output id="speedValue" for="speedSlider">1.00x</output>
             </label>
           </div>
         </div>
       </section>
 
       <footer class="app-footer">
-        SectionFinder v0.1 | &copy; 2026 Mark Yu
+        SectionFinder v0.2 | &copy; 2026 Mark Yu
       </footer>
     </main>
 

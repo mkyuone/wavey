@@ -1,0 +1,8 @@
+{
+  "extName": {
+    "message": "SectionFinder"
+  },
+  "extDescription": {
+    "message": "透過可視化波形與音訊/靜音段快速跳轉，更快檢查音訊。檔案只會在瀏覽器本機處理。"
+  }
+}

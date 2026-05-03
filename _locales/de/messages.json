@@ -1,0 +1,8 @@
+{
+  "extName": {
+    "message": "SectionFinder"
+  },
+  "extDescription": {
+    "message": "Prüfe Audio schneller mit einer visuellen Wellenform und schnellen Sprüngen zwischen Ton und Stille. Dateien bleiben lokal im Browser."
+  }
+}
