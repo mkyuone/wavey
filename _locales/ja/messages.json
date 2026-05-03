@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "SectionFinder"
+    "message": "AudioNavigator"
   },
   "extDescription": {
     "message": "音声波形を見ながら、音のある区間と無音区間をすばやく移動して音声を効率よく確認できます。ファイルはブラウザ内でローカルに処理されます。"
