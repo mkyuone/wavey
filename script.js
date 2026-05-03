@@ -3,7 +3,6 @@ const languageSelect = document.querySelector("#languageSelect");
 const dropOpenButton = document.querySelector("#dropOpenButton");
 const dropZone = document.querySelector("#dropZone");
 const playerPanel = document.querySelector("#playerPanel");
-const audio = document.querySelector("#audio");
 const canvas = document.querySelector("#waveformCanvas");
 const ctx = canvas.getContext("2d");
 const fileName = document.querySelector("#fileName");
@@ -135,18 +134,20 @@ const translations = {
 const state = {
   language: "en",
   audioBuffer: null,
-  objectUrl: "",
+  mediaDuration: 0,
   peaks: [],
   rmsFrames: [],
   regions: [],
   silentRegions: [],
   threshold: 0,
   audioContext: null,
-  mediaSource: null,
-  channelSplitter: null,
-  monoNode: null,
+  audioSource: null,
   gainNode: null,
   limiterNode: null,
+  playbackOffset: 0,
+  playbackStartedAt: 0,
+  playbackRate: 1,
+  isPlaying: false,
   jumpAmount: 10,
   statusKey: "ready",
   statusParams: {},
@@ -220,7 +221,7 @@ volumeSlider.addEventListener("input", updateOutputGain);
 nextAudio.addEventListener("click", seekToNextAudio);
 
 function seekToNextAudio() {
-  const current = audio.currentTime;
+  const current = getCurrentTime();
   const currentRegion = state.regions.find((item) => item.start <= current && item.end >= current);
   const targetTime = currentRegion ? currentRegion.end + SEEK_EPSILON : current + SEEK_EPSILON;
   const region = state.regions.find((item) => item.start > targetTime);
@@ -230,10 +231,11 @@ function seekToNextAudio() {
 }
 
 timeline.addEventListener("input", () => {
-  if (!audio.duration) {
+  const duration = getMediaDuration();
+  if (!duration) {
     return;
   }
-  setCurrentTime((Number(timeline.value) / 1000) * audio.duration);
+  setCurrentTime((Number(timeline.value) / 1000) * duration);
 });
 
 canvas.addEventListener("pointerdown", (event) => {
@@ -255,23 +257,6 @@ canvas.addEventListener("pointerup", () => {
   state.isPointerSeeking = false;
 });
 
-audio.addEventListener("play", () => {
-  setPlayButton(true);
-  startDrawingLoop();
-});
-
-audio.addEventListener("pause", () => {
-  setPlayButton(false);
-  cancelAnimationFrame(state.animationFrame);
-  drawWaveform();
-});
-
-audio.addEventListener("ended", () => {
-  setPlayButton(false);
-  drawWaveform();
-});
-
-audio.addEventListener("timeupdate", updateTimeUi);
 window.addEventListener("resize", resizeCanvas);
 document.addEventListener("keydown", handleKeyboardControls);
 applyLanguage();
@@ -299,18 +284,15 @@ async function loadFile(file) {
     const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
     await audioContext.close();
 
-    if (state.objectUrl) {
-      URL.revokeObjectURL(state.objectUrl);
-    }
-
+    stopPlayback();
     state.audioBuffer = decodedBuffer;
-    state.objectUrl = URL.createObjectURL(file);
-    audio.src = state.objectUrl;
+    state.mediaDuration = decodedBuffer.duration;
+    state.playbackOffset = 0;
     updatePlaybackSpeed();
     updateOutputGain();
 
     fileName.textContent = file.name;
-    fileDetails.textContent = `${formatFileSize(file.size)} · ${formatTime(decodedBuffer.duration)}`;
+    fileDetails.textContent = `${formatFileSize(file.size)} · ${formatTime(getMediaDuration())}`;
 
     dropZone.classList.add("is-hidden");
     playerPanel.classList.remove("is-hidden");
@@ -335,20 +317,19 @@ async function loadFile(file) {
 }
 
 async function togglePlayback() {
-  if (!audio.src) {
+  if (!state.audioBuffer) {
     return;
   }
 
-  if (audio.paused) {
-    await ensureAudioGraph();
-    await audio.play();
+  if (state.isPlaying) {
+    pausePlayback();
   } else {
-    audio.pause();
+    await startPlayback();
   }
 }
 
 function handleKeyboardControls(event) {
-  if (event.defaultPrevented || shouldIgnoreShortcut(event.target) || !audio.src) {
+  if (event.defaultPrevented || shouldIgnoreShortcut(event.target) || !state.audioBuffer) {
     return;
   }
 
@@ -384,12 +365,11 @@ function buildPeaks() {
   const buffer = state.audioBuffer;
   const channelData = collectMonoSamples(buffer);
   const bucketCount = Math.min(Math.max(Math.floor(buffer.duration * 120), 800), 24000);
-  const samplesPerBucket = Math.max(1, Math.floor(channelData.length / bucketCount));
   const peaks = [];
 
   for (let bucket = 0; bucket < bucketCount; bucket += 1) {
-    const start = bucket * samplesPerBucket;
-    const end = Math.min(start + samplesPerBucket, channelData.length);
+    const start = Math.floor((bucket / bucketCount) * channelData.length);
+    const end = Math.max(start + 1, Math.floor(((bucket + 1) / bucketCount) * channelData.length));
     let min = 0;
     let max = 0;
     let sum = 0;
@@ -534,7 +514,7 @@ function drawGrid(width, height) {
 }
 
 function drawSilence(width, height) {
-  const duration = state.audioBuffer.duration;
+  const duration = getAnalysisDuration();
   ctx.fillStyle = "rgba(226, 231, 241, 0.72)";
 
   state.silentRegions.forEach((region) => {
@@ -582,12 +562,12 @@ function drawEnvelope(width, height) {
 }
 
 function drawPlayhead(width, height) {
-  const duration = state.audioBuffer.duration || audio.duration;
+  const duration = getAnalysisDuration();
   if (!duration) {
     return;
   }
 
-  const x = (audio.currentTime / duration) * width;
+  const x = (getCurrentTime() / duration) * width;
   ctx.strokeStyle = "#181817";
   ctx.lineWidth = Math.max(2, (window.devicePixelRatio || 1) * 1.5);
   ctx.beginPath();
@@ -611,42 +591,59 @@ function startDrawingLoop() {
 function seekFromPointer(event) {
   const rect = canvas.getBoundingClientRect();
   const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-  setCurrentTime(ratio * state.audioBuffer.duration);
+  setCurrentTime(ratio * getAnalysisDuration());
 }
 
 function seekBy(seconds) {
-  if (!audio.duration) {
+  if (!getMediaDuration()) {
     return;
   }
-  setCurrentTime(audio.currentTime + seconds);
+  setCurrentTime(getCurrentTime() + seconds);
 }
 
 function setCurrentTime(seconds) {
-  if (!audio.duration && !state.audioBuffer) {
+  if (!getMediaDuration()) {
     return;
   }
 
-  const duration = audio.duration || state.audioBuffer.duration;
-  audio.currentTime = Math.min(Math.max(seconds, 0), duration);
+  const duration = getMediaDuration();
+  const wasPlaying = state.isPlaying;
+  state.playbackOffset = clampTime(seconds, duration);
+  if (wasPlaying) {
+    restartPlaybackAtCurrentTime();
+  }
   updateTimeUi();
   drawWaveform();
 }
 
 function updateTimeUi() {
-  const duration = audio.duration || state.audioBuffer?.duration || 0;
-  currentTime.textContent = formatTime(audio.currentTime || 0);
+  const duration = getMediaDuration();
+  const current = getCurrentTime();
+  currentTime.textContent = formatTime(current);
   durationText.textContent = formatTime(duration);
-  timeline.value = duration ? String(Math.round((audio.currentTime / duration) * 1000)) : "0";
+  timeline.value = duration ? String(Math.round((current / duration) * 1000)) : "0";
+}
+
+function getAnalysisDuration() {
+  return state.audioBuffer?.duration || 0;
+}
+
+function getMediaDuration() {
+  return getFiniteDuration(state.mediaDuration) || getAnalysisDuration();
+}
+
+function clampTime(seconds, duration) {
+  return Math.min(Math.max(seconds || 0, 0), duration);
+}
+
+function getFiniteDuration(duration) {
+  return Number.isFinite(duration) && duration > 0 ? duration : 0;
 }
 
 async function ensureAudioGraph() {
   if (!state.audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     state.audioContext = new AudioContextClass();
-    state.mediaSource = state.audioContext.createMediaElementSource(audio);
-    state.channelSplitter = state.audioContext.createChannelSplitter(32);
-    state.monoNode = state.audioContext.createGain();
-    state.monoNode.gain.value = 1 / Math.max(1, state.audioBuffer?.numberOfChannels || 1);
     state.gainNode = state.audioContext.createGain();
     state.limiterNode = state.audioContext.createDynamicsCompressor();
     state.limiterNode.threshold.value = -1;
@@ -654,7 +651,8 @@ async function ensureAudioGraph() {
     state.limiterNode.ratio.value = 20;
     state.limiterNode.attack.value = 0.003;
     state.limiterNode.release.value = 0.08;
-    updateAudioRouting();
+    state.gainNode.connect(state.limiterNode);
+    state.limiterNode.connect(state.audioContext.destination);
   }
 
   if (state.audioContext.state === "suspended") {
@@ -664,31 +662,119 @@ async function ensureAudioGraph() {
   updateOutputGain();
 }
 
-function updateAudioRouting() {
-  if (!state.audioContext || !state.mediaSource || !state.channelSplitter || !state.monoNode || !state.gainNode || !state.limiterNode) {
+async function startPlayback() {
+  if (!state.audioBuffer) {
     return;
   }
 
-  state.mediaSource.disconnect();
-  state.channelSplitter.disconnect();
-  state.monoNode.disconnect();
-  state.gainNode.disconnect();
-  state.limiterNode.disconnect();
+  await ensureAudioGraph();
+  if (state.playbackOffset >= getMediaDuration() - SEEK_EPSILON) {
+    state.playbackOffset = 0;
+  }
+  if (!startAudioSource()) {
+    return;
+  }
+  state.isPlaying = true;
+  setPlayButton(true);
+  startDrawingLoop();
+}
 
-  state.mediaSource.connect(state.channelSplitter);
-
-  const channelCount = Math.max(1, state.audioBuffer?.numberOfChannels || 1);
-  state.monoNode.gain.value = 1 / channelCount;
-
-  for (let channel = 0; channel < channelCount; channel += 1) {
-    state.channelSplitter.connect(state.monoNode, channel, 0);
+function pausePlayback() {
+  if (!state.isPlaying) {
+    return;
   }
 
-  state.monoNode.connect(state.gainNode);
-  state.gainNode.connect(state.limiterNode);
-  state.limiterNode.connect(state.audioContext.destination);
+  state.playbackOffset = getCurrentTime();
+  state.isPlaying = false;
+  stopAudioSource();
+  setPlayButton(false);
+  cancelAnimationFrame(state.animationFrame);
+  updateTimeUi();
+  drawWaveform();
+}
 
-  updateOutputGain();
+function stopPlayback() {
+  state.isPlaying = false;
+  state.playbackOffset = 0;
+  stopAudioSource();
+  setPlayButton(false);
+  cancelAnimationFrame(state.animationFrame);
+}
+
+function restartPlaybackAtCurrentTime() {
+  if (state.playbackOffset >= getMediaDuration() - SEEK_EPSILON) {
+    finishPlayback();
+    return;
+  }
+
+  stopAudioSource();
+  startAudioSource();
+}
+
+function startAudioSource() {
+  if (!state.audioContext || !state.audioBuffer || !state.gainNode) {
+    return false;
+  }
+
+  const duration = getMediaDuration();
+  const offset = clampTime(state.playbackOffset, duration);
+  if (offset >= duration) {
+    finishPlayback();
+    return false;
+  }
+
+  const source = state.audioContext.createBufferSource();
+  source.buffer = state.audioBuffer;
+  source.playbackRate.value = state.playbackRate;
+  source.connect(state.gainNode);
+  source.addEventListener("ended", () => {
+    if (state.audioSource !== source || !state.isPlaying) {
+      return;
+    }
+
+    finishPlayback();
+  });
+
+  state.audioSource = source;
+  state.playbackOffset = offset;
+  state.playbackStartedAt = state.audioContext.currentTime;
+  source.start(0, offset);
+  return true;
+}
+
+function stopAudioSource() {
+  if (!state.audioSource) {
+    return;
+  }
+
+  const source = state.audioSource;
+  state.audioSource = null;
+  source.disconnect();
+  try {
+    source.stop();
+  } catch (error) {
+    // Already stopped sources can throw in some browsers.
+  }
+}
+
+function finishPlayback() {
+  state.isPlaying = false;
+  stopAudioSource();
+  state.playbackOffset = getMediaDuration();
+  setPlayButton(false);
+  cancelAnimationFrame(state.animationFrame);
+  updateTimeUi();
+  drawWaveform();
+}
+
+function getCurrentTime() {
+  const duration = getMediaDuration();
+  if (!state.isPlaying || !state.audioContext) {
+    return clampTime(state.playbackOffset, duration);
+  }
+
+  const elapsed = (state.audioContext.currentTime - state.playbackStartedAt) * state.playbackRate;
+  return clampTime(state.playbackOffset + elapsed, duration);
 }
 
 function updateOutputGain() {
@@ -704,7 +790,16 @@ function updateOutputGain() {
 
 function updatePlaybackSpeed() {
   const speed = Number(speedSlider.value);
-  audio.playbackRate = speed;
+  if (state.isPlaying) {
+    state.playbackOffset = getCurrentTime();
+    state.playbackStartedAt = state.audioContext?.currentTime || 0;
+  }
+
+  state.playbackRate = speed;
+  if (state.audioSource) {
+    state.audioSource.playbackRate.value = speed;
+  }
+
   speedValue.textContent = `${Number.isInteger(speed) ? speed : speed.toFixed(2).replace(/0$/, "")}x`;
 }
 
@@ -775,7 +870,7 @@ function applyLanguage() {
     loadingDetail.textContent = translate(state.busyDetailKey, state.busyDetailParams);
   }
 
-  setPlayButton(!audio.paused && Boolean(audio.src));
+  setPlayButton(state.isPlaying);
 }
 
 function setStatus(key, params = {}) {
@@ -793,7 +888,7 @@ function setError(key) {
 }
 
 function getLongSilentRegions(audibleRegions) {
-  const duration = state.audioBuffer.duration;
+  const duration = getAnalysisDuration();
   const silentRegions = [];
   let cursor = 0;
 
