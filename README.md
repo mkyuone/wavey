@@ -1,6 +1,6 @@
-# SoundFinder
+# SectionFinder
 
-Project repo for SoundFinder, a tiny static web app for opening an audio file locally, viewing an interactive waveform, and jumping through audible sections or silent gaps.
+Project repo for SectionFinder, a tiny static web app for opening an audio file locally, viewing an interactive waveform, and jumping through audible sections or silent gaps.
 
 ## Run
 
