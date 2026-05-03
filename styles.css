@@ -580,6 +580,8 @@ output {
   height: 100%;
   border-radius: inherit;
   background: var(--accent);
+  transform: translateX(0);
+  animation: none;
   transition: width 180ms ease;
 }
 

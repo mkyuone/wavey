@@ -163,6 +163,7 @@ const RMS_WINDOW_SECONDS = 0.05;
 const MIN_AUDIBLE_SECONDS = 0.2;
 const MIN_SILENCE_SECONDS = 12;
 const SEEK_EPSILON = 0.08;
+const ANALYSIS_CHUNK_DURATION_MS = 16;
 
 languageSelect.addEventListener("change", () => {
   state.language = languageSelect.value;
@@ -297,17 +298,23 @@ async function loadFile(file) {
     dropZone.classList.add("is-hidden");
     playerPanel.classList.remove("is-hidden");
 
-    setBusy(true, "processingAudio", "buildingWaveform", {}, null);
+    setBusy(true, "processingAudio", "buildingWaveform", {}, 50);
     await nextPaint();
-    buildPeaks();
-    setBusy(true, "processingAudio", "findingSilence", {}, null);
+    await buildPeaks((progress) => {
+      setBusyProgress(progress);
+    });
+    setBusy(true, "processingAudio", "findingSilence", {}, 90);
     await nextPaint();
-    buildRmsFrames();
+    await buildRmsFrames((progress) => {
+      setBusyProgress(progress);
+    });
     updateAutoThreshold();
     analyzeRegions();
     resizeCanvas();
     updateTimeUi();
     setAnalysisStatus();
+    setBusy(true, "processingAudio", "findingSilence", {}, 100);
+    await nextPaint();
     setBusy(false);
   } catch (error) {
     console.error(error);
@@ -361,11 +368,12 @@ function shouldIgnoreShortcut(target) {
   return Boolean(target?.closest("input, select, textarea, button, [contenteditable='true']"));
 }
 
-function buildPeaks() {
+async function buildPeaks(onProgress = () => {}) {
   const buffer = state.audioBuffer;
   const channelData = collectMonoSamples(buffer);
   const bucketCount = Math.min(Math.max(Math.floor(buffer.duration * 120), 800), 24000);
   const peaks = [];
+  let chunkStartedAt = performance.now();
 
   for (let bucket = 0; bucket < bucketCount; bucket += 1) {
     const start = Math.floor((bucket / bucketCount) * channelData.length);
@@ -386,16 +394,27 @@ function buildPeaks() {
       max,
       rms: Math.sqrt(sum / Math.max(1, end - start)),
     });
+
+    if (performance.now() - chunkStartedAt >= ANALYSIS_CHUNK_DURATION_MS) {
+      const completion = (bucket + 1) / bucketCount;
+      onProgress(50 + completion * 40);
+      await nextPaint();
+      chunkStartedAt = performance.now();
+    }
   }
 
   state.peaks = smoothPeaks(peaks, 3);
+  onProgress(90);
 }
 
-function buildRmsFrames() {
+async function buildRmsFrames(onProgress = () => {}) {
   const buffer = state.audioBuffer;
   const samples = collectMonoSamples(buffer);
   const windowSize = Math.max(1, Math.floor(buffer.sampleRate * RMS_WINDOW_SECONDS));
   const frames = [];
+  const totalFrames = Math.max(1, Math.ceil(samples.length / windowSize));
+  let processedFrames = 0;
+  let chunkStartedAt = performance.now();
 
   for (let start = 0; start < samples.length; start += windowSize) {
     const end = Math.min(start + windowSize, samples.length);
@@ -410,9 +429,18 @@ function buildRmsFrames() {
       end: end / buffer.sampleRate,
       rms: Math.sqrt(sum / Math.max(1, end - start)),
     });
+
+    processedFrames += 1;
+    if (performance.now() - chunkStartedAt >= ANALYSIS_CHUNK_DURATION_MS) {
+      const completion = processedFrames / totalFrames;
+      onProgress(90 + completion * 10);
+      await nextPaint();
+      chunkStartedAt = performance.now();
+    }
   }
 
   state.rmsFrames = frames;
+  onProgress(100);
 }
 
 function collectMonoSamples(buffer) {
@@ -965,6 +993,12 @@ function setBusy(isBusy, titleKey = "processingAudio", detailKey = "preparingWav
   }
 
   loadingOverlay.classList.toggle("is-hidden", !isBusy);
+}
+
+function setBusyProgress(progress) {
+  const percent = Math.min(100, Math.max(0, progress));
+  loadingProgressTrack.classList.remove("is-indeterminate");
+  loadingProgressBar.style.width = `${percent}%`;
 }
 
 function nextPaint() {
