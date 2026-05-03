@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "SectionFinder",
+  "version": "0.1.0",
+  "description": "Open local audio files, view their waveform, and jump through audible sections or silence gaps.",
+  "action": {
+    "default_title": "SectionFinder"
+  },
+  "background": {
+    "service_worker": "extension/background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self';"
+  },
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  }
+}
