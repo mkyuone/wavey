@@ -425,6 +425,7 @@ const state = {
   language: getPreferredLanguage(),
   audioBuffer: null,
   mediaDuration: 0,
+  monoSamples: null,
   peaks: [],
   rmsFrames: [],
   regions: [],
@@ -447,6 +448,14 @@ const state = {
   busyDetailParams: {},
   isPointerSeeking: false,
   animationFrame: 0,
+  resizeFrame: 0,
+  staticWaveformCanvas: null,
+  staticWaveformContext: null,
+  canvasPixelWidth: 0,
+  canvasPixelHeight: 0,
+  lastCurrentTimeText: "",
+  lastDurationText: "",
+  lastTimelineValue: "",
 };
 
 const RMS_WINDOW_SECONDS = 0.05;
@@ -624,7 +633,7 @@ waveformWrap.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 });
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", scheduleResizeCanvas);
 document.addEventListener("keydown", handleKeyboardControls);
 setLanguage(state.language, false);
 applyLanguage();
@@ -649,13 +658,15 @@ async function loadFile(file) {
     await nextPaint();
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContextClass();
-    const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+    const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
     await audioContext.close();
 
     stopPlayback();
+    clearAnalysisCaches();
     state.audioBuffer = decodedBuffer;
     state.mediaDuration = decodedBuffer.duration;
     state.playbackOffset = 0;
+    resetTimeUiCache();
     updatePlaybackSpeed();
     updateOutputGain();
 
@@ -771,6 +782,7 @@ async function buildPeaks(onProgress = () => {}) {
   }
 
   state.peaks = smoothPeaks(peaks, 3);
+  clearWaveformCache();
   onProgress(90);
 }
 
@@ -811,6 +823,10 @@ async function buildRmsFrames(onProgress = () => {}) {
 }
 
 function collectMonoSamples(buffer) {
+  if (state.monoSamples?.length === buffer.length) {
+    return state.monoSamples;
+  }
+
   const output = new Float32Array(buffer.length);
 
   for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
@@ -820,6 +836,7 @@ function collectMonoSamples(buffer) {
     }
   }
 
+  state.monoSamples = output;
   return output;
 }
 
@@ -871,55 +888,106 @@ function analyzeRegions() {
 
   state.regions = audibleRegions;
   state.silentRegions = getLongSilentRegions(audibleRegions);
+  clearWaveformCache();
   setAnalysisStatus();
+}
+
+function scheduleResizeCanvas() {
+  if (state.resizeFrame) {
+    return;
+  }
+
+  state.resizeFrame = requestAnimationFrame(() => {
+    state.resizeFrame = 0;
+    resizeCanvas();
+  });
 }
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
-  canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-  canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+  const width = Math.max(1, Math.floor(rect.width * ratio));
+  const height = Math.max(1, Math.floor(rect.height * ratio));
+
+  if (canvas.width !== width) {
+    canvas.width = width;
+  }
+
+  if (canvas.height !== height) {
+    canvas.height = height;
+  }
+
+  if (state.canvasPixelWidth !== width || state.canvasPixelHeight !== height) {
+    state.canvasPixelWidth = width;
+    state.canvasPixelHeight = height;
+    clearWaveformCache();
+  }
+
   drawWaveform();
 }
 
 function drawWaveform() {
   const { width, height } = canvas;
+  if (!state.staticWaveformCanvas || state.staticWaveformCanvas.width !== width || state.staticWaveformCanvas.height !== height) {
+    renderStaticWaveform(width, height);
+  }
+
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "#f8f9fc";
-  ctx.fillRect(0, 0, width, height);
+  if (state.staticWaveformCanvas) {
+    ctx.drawImage(state.staticWaveformCanvas, 0, 0);
+  }
+
+  if (state.audioBuffer && state.peaks.length) {
+    drawPlayhead(ctx, width, height);
+  }
+}
+
+function renderStaticWaveform(width, height) {
+  if (!state.staticWaveformCanvas) {
+    state.staticWaveformCanvas = document.createElement("canvas");
+    state.staticWaveformContext = state.staticWaveformCanvas.getContext("2d");
+  }
+
+  const staticCanvas = state.staticWaveformCanvas;
+  const staticCtx = state.staticWaveformContext;
+  staticCanvas.width = width;
+  staticCanvas.height = height;
+
+  staticCtx.clearRect(0, 0, width, height);
+  staticCtx.fillStyle = "#f8f9fc";
+  staticCtx.fillRect(0, 0, width, height);
 
   if (!state.audioBuffer || !state.peaks.length) {
     return;
   }
 
-  drawGrid(width, height);
-  drawSilence(width, height);
-  drawEnvelope(width, height);
-  drawPlayhead(width, height);
+  drawGrid(staticCtx, width, height);
+  drawSilence(staticCtx, width, height);
+  drawEnvelope(staticCtx, width, height);
 }
 
-function drawGrid(width, height) {
+function drawGrid(context, width, height) {
   const centerY = height / 2;
-  ctx.strokeStyle = "#e4e8f0";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, centerY);
-  ctx.lineTo(width, centerY);
-  ctx.stroke();
+  context.strokeStyle = "#e4e8f0";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(0, centerY);
+  context.lineTo(width, centerY);
+  context.stroke();
 }
 
-function drawSilence(width, height) {
+function drawSilence(context, width, height) {
   const duration = getAnalysisDuration();
-  ctx.fillStyle = "rgba(226, 231, 241, 0.72)";
+  context.fillStyle = "rgba(226, 231, 241, 0.72)";
 
   state.silentRegions.forEach((region) => {
     const x = (region.start / duration) * width;
     const w = ((region.end - region.start) / duration) * width;
-    ctx.fillRect(x, 0, w, height);
+    context.fillRect(x, 0, w, height);
   });
 }
 
-function drawEnvelope(width, height) {
+function drawEnvelope(context, width, height) {
   const centerY = height / 2;
   const peakStep = state.peaks.length / width;
   const inset = height * 0.06;
@@ -933,42 +1001,42 @@ function drawEnvelope(width, height) {
     points.push({ x, y: amplitude * available });
   }
 
-  ctx.beginPath();
+  context.beginPath();
   points.forEach((point, index) => {
     const y = centerY - point.y;
     if (index === 0) {
-      ctx.moveTo(point.x, y);
+      context.moveTo(point.x, y);
     } else {
-      ctx.lineTo(point.x, y);
+      context.lineTo(point.x, y);
     }
   });
 
   [...points].reverse().forEach((point) => {
-    ctx.lineTo(point.x, centerY + point.y);
+    context.lineTo(point.x, centerY + point.y);
   });
 
-  ctx.closePath();
-  ctx.fillStyle = "#526AF2";
-  ctx.fill();
+  context.closePath();
+  context.fillStyle = "#526AF2";
+  context.fill();
 
-  ctx.strokeStyle = "#526AF2";
-  ctx.lineWidth = Math.max(1, window.devicePixelRatio || 1);
-  ctx.stroke();
+  context.strokeStyle = "#526AF2";
+  context.lineWidth = Math.max(1, window.devicePixelRatio || 1);
+  context.stroke();
 }
 
-function drawPlayhead(width, height) {
+function drawPlayhead(context, width, height) {
   const duration = getAnalysisDuration();
   if (!duration) {
     return;
   }
 
   const x = (getCurrentTime() / duration) * width;
-  ctx.strokeStyle = "#181817";
-  ctx.lineWidth = Math.max(2, (window.devicePixelRatio || 1) * 1.5);
-  ctx.beginPath();
-  ctx.moveTo(x, 0);
-  ctx.lineTo(x, height);
-  ctx.stroke();
+  context.strokeStyle = "#181817";
+  context.lineWidth = Math.max(2, (window.devicePixelRatio || 1) * 1.5);
+  context.beginPath();
+  context.moveTo(x, 0);
+  context.lineTo(x, height);
+  context.stroke();
 }
 
 function startDrawingLoop() {
@@ -1014,10 +1082,25 @@ function setCurrentTime(seconds) {
 function updateTimeUi() {
   const duration = getMediaDuration();
   const current = getCurrentTime();
-  currentTime.textContent = formatTime(current);
-  durationText.textContent = formatTime(duration);
-  timeline.value = duration ? String(Math.round((current / duration) * 1000)) : "0";
-  updateRangeFill(timeline);
+  const currentText = formatTime(current);
+  const durationLabel = formatTime(duration);
+  const timelineValue = duration ? String(Math.round((current / duration) * 1000)) : "0";
+
+  if (state.lastCurrentTimeText !== currentText) {
+    currentTime.textContent = currentText;
+    state.lastCurrentTimeText = currentText;
+  }
+
+  if (state.lastDurationText !== durationLabel) {
+    durationText.textContent = durationLabel;
+    state.lastDurationText = durationLabel;
+  }
+
+  if (state.lastTimelineValue !== timelineValue) {
+    timeline.value = timelineValue;
+    updateRangeFill(timeline);
+    state.lastTimelineValue = timelineValue;
+  }
 }
 
 function getAnalysisDuration() {
@@ -1416,6 +1499,27 @@ function getLongSilentRegions(audibleRegions) {
   }
 
   return silentRegions;
+}
+
+function clearAnalysisCaches() {
+  state.monoSamples = null;
+  state.peaks = [];
+  state.rmsFrames = [];
+  state.regions = [];
+  state.silentRegions = [];
+  state.threshold = 0;
+  clearWaveformCache();
+}
+
+function clearWaveformCache() {
+  state.staticWaveformCanvas = null;
+  state.staticWaveformContext = null;
+}
+
+function resetTimeUiCache() {
+  state.lastCurrentTimeText = "";
+  state.lastDurationText = "";
+  state.lastTimelineValue = "";
 }
 
 function setAnalysisStatus() {
