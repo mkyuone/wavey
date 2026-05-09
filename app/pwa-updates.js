@@ -21,11 +21,7 @@ function registerPwaServiceWorker() {
   });
 
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (!state.pwaUpdateRestartRequested || state.pwaReloadingForUpdate) {
-      return;
-    }
-    state.pwaReloadingForUpdate = true;
-    window.location.reload();
+    forceRefreshAppShell();
   });
 }
 
@@ -55,12 +51,24 @@ function showPwaUpdateNotice(worker) {
 }
 
 function restartPwaForUpdate() {
-  if (!state.pwaWaitingWorker) {
+  pwaUpdateRestart.disabled = true;
+
+  if (state.pwaWaitingWorker) {
+    state.pwaWaitingWorker.postMessage({ type: "SKIP_WAITING" });
+  }
+
+  window.setTimeout(forceRefreshAppShell, 800);
+}
+
+function forceRefreshAppShell() {
+  if (state.pwaReloadingForUpdate) {
     return;
   }
-  state.pwaUpdateRestartRequested = true;
-  state.pwaWaitingWorker.postMessage({ type: "SKIP_WAITING" });
-  pwaUpdateRestart.disabled = true;
+  state.pwaReloadingForUpdate = true;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("app-refresh", Date.now().toString(36));
+  window.location.replace(url.href);
 }
 
 function isPwaInstallContext() {
@@ -81,7 +89,10 @@ function syncInstallButton() {
     state.deferredInstallPrompt = null;
   }
 
-  installButton.classList.toggle("is-hidden", !state.deferredInstallPrompt || !isPwaInstallContext());
+  installButton.classList.toggle(
+    "is-hidden",
+    !state.settings.showInstallButton || !state.deferredInstallPrompt || !isPwaInstallContext(),
+  );
 }
 
 async function promptPwaInstall() {
@@ -101,4 +112,3 @@ async function promptPwaInstall() {
     console.warn("AudioNavigator install prompt was dismissed before a choice was returned.", error);
   }
 }
-

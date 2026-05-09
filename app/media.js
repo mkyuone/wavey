@@ -55,6 +55,7 @@ async function loadFile(file) {
     setBusy(true, "processingAudio", "findingSilence", {}, 100);
     await nextPaint();
     setBusy(false);
+    maybeShowWaveformSeekHint();
   } catch (error) {
     console.error(error);
     setError(error instanceof UnsupportedMediaError ? "unsupportedCodec" : "decodeError");
@@ -322,4 +323,3 @@ function readFileAsArrayBuffer(file, onProgress) {
     reader.readAsArrayBuffer(file);
   });
 }
-

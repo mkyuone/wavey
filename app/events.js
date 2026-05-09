@@ -34,6 +34,8 @@ themeOptions.forEach((option) => {
   input.addEventListener("input", updateDetectionSetting);
 });
 
+showInstallButtonInput.addEventListener("change", updateInstallButtonSetting);
+
 resetSettings.addEventListener("click", resetDefaultSettings);
 
 languageControl.addEventListener("click", (event) => {
@@ -185,6 +187,7 @@ timeline.addEventListener("input", () => {
   if (!duration) {
     return;
   }
+  hideWaveformSeekHint();
   setCurrentTime((Number(timeline.value) / 1000) * duration);
 });
 
@@ -198,6 +201,7 @@ canvas.addEventListener("pointerdown", (event) => {
   }
   canvas.setPointerCapture(event.pointerId);
   state.isPointerSeeking = true;
+  hideWaveformSeekHint();
   hideWaveformHover();
   seekFromPointer(event);
 });

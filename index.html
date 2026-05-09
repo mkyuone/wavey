@@ -57,6 +57,10 @@
 
         <div class="waveform-wrap">
           <canvas id="waveformCanvas" aria-label="Interactive audio waveform" data-i18n-aria="interactiveWaveform"></canvas>
+          <div id="waveformSeekHint" class="waveform-seek-hint is-hidden" role="status" aria-live="polite">
+            <span class="material-symbols-sharp ui-icon" aria-hidden="true">ads_click</span>
+            <span data-i18n="waveformSeekHint">Click or drag the waveform to seek</span>
+          </div>
         </div>
 
         <div class="time-row">
@@ -200,6 +204,16 @@
                   <span data-i18n="themeLight">Light</span>
                 </label>
               </fieldset>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-copy">
+                <p id="showInstallButtonLabel" data-i18n="showInstallButton">Show install button</p>
+              </div>
+              <label class="settings-switch" aria-labelledby="showInstallButtonLabel">
+                <input id="showInstallButtonInput" type="checkbox" checked>
+                <span aria-hidden="true"></span>
+              </label>
             </div>
           </section>
 

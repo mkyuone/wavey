@@ -82,10 +82,12 @@ function applyTheme() {
 
 function syncSettingsControls() {
   syncThemeControls();
+  showInstallButtonInput.checked = Boolean(state.settings.showInstallButton);
   silenceThresholdInput.value = String(state.settings.silenceThreshold);
   minSilenceInput.value = String(state.settings.minSilenceSeconds);
   minAudibleInput.value = String(state.settings.minAudibleSeconds);
   updateSettingsOutputs();
+  syncInstallButton();
 }
 
 function syncAppVersion() {
@@ -107,6 +109,12 @@ function updateDetectionSetting() {
   updateSettingsOutputs();
   persistSettings();
   reanalyzeSilenceSettings();
+}
+
+function updateInstallButtonSetting() {
+  state.settings.showInstallButton = showInstallButtonInput.checked;
+  persistSettings();
+  syncInstallButton();
 }
 
 function updateSettingsOutputs() {
@@ -252,6 +260,7 @@ function getSettingsPayload() {
   return {
     language: state.language,
     theme: state.settings.theme,
+    showInstallButton: state.settings.showInstallButton,
     silenceThreshold: state.settings.silenceThreshold,
     minSilenceSeconds: state.settings.minSilenceSeconds,
     minAudibleSeconds: state.settings.minAudibleSeconds,
@@ -321,6 +330,7 @@ function applySavedSettings(settings) {
   state.language = settings.language;
   state.settings = {
     theme: settings.theme,
+    showInstallButton: settings.showInstallButton,
     silenceThreshold: settings.silenceThreshold,
     minSilenceSeconds: settings.minSilenceSeconds,
     minAudibleSeconds: settings.minAudibleSeconds,
@@ -517,6 +527,41 @@ function scheduleGlobalDragReset() {
   state.globalDragResetTimer = window.setTimeout(() => {
     hideGlobalDropOverlay();
   }, 700);
+}
+
+function maybeShowWaveformSeekHint() {
+  if (!state.audioBuffer || !state.peaks.length || hasSeenWaveformSeekHint()) {
+    return;
+  }
+
+  markWaveformSeekHintSeen();
+  waveformSeekHint.classList.remove("is-hidden");
+  waveformSeekHint.setAttribute("aria-hidden", "false");
+  window.clearTimeout(state.waveformHintTimer);
+  state.waveformHintTimer = window.setTimeout(hideWaveformSeekHint, 5200);
+}
+
+function hideWaveformSeekHint() {
+  window.clearTimeout(state.waveformHintTimer);
+  state.waveformHintTimer = 0;
+  waveformSeekHint.classList.add("is-hidden");
+  waveformSeekHint.setAttribute("aria-hidden", "true");
+}
+
+function hasSeenWaveformSeekHint() {
+  try {
+    return localStorage.getItem(WAVEFORM_HINT_STORAGE_KEY) === "seen";
+  } catch (error) {
+    return false;
+  }
+}
+
+function markWaveformSeekHintSeen() {
+  try {
+    localStorage.setItem(WAVEFORM_HINT_STORAGE_KEY, "seen");
+  } catch (error) {
+    // Private or restricted storage should not block the hint.
+  }
 }
 
 function setBusy(isBusy, titleKey = "processingAudio", detailKey = "preparingWaveform", detailParams = {}, progress = null) {

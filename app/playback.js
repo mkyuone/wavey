@@ -84,6 +84,7 @@ function setCurrentTime(seconds) {
     return;
   }
 
+  hideWaveformSeekHint();
   const duration = getMediaDuration();
   const wasPlaying = state.isPlaying;
   state.playbackOffset = clampTime(seconds, duration);
@@ -331,4 +332,3 @@ function setPlayButton(isPlaying) {
     labelElement.textContent = label;
   }
 }
-
