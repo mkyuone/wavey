@@ -18,7 +18,7 @@
             <span class="material-symbols-sharp ui-icon" aria-hidden="true">settings</span>
           </button>
           <label class="file-button">
-            <input id="fileInput" type="file" accept="audio/*">
+            <input id="fileInput" type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.m4v,.mov,.webm,.mkv,.avi">
             <span class="material-symbols-sharp ui-icon" aria-hidden="true">audio_file</span>
             <span data-i18n="openAudio">Open audio</span>
           </label>
@@ -29,7 +29,8 @@
         <div class="drop-copy">
           <strong data-i18n="dropAudio">Drop an audio file here</strong>
           <p class="privacy-note" data-i18n="privacyNote">Your file stays private, local, and is not uploaded.</p>
-          <p class="format-note" data-i18n="supportedFormats">Supports MP3, WAV, M4A, AAC, OGG, and FLAC.</p>
+          <p class="format-note" data-i18n="supportedFormats">Supports common audio and video formats.</p>
+          <p id="dropError" class="drop-error is-hidden" role="alert"></p>
           <button id="dropOpenButton" type="button">
             <span class="material-symbols-sharp ui-icon" aria-hidden="true">audio_file</span>
             <span data-i18n="openAudio">Open audio</span>

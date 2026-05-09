@@ -17,6 +17,7 @@ const languageControl = document.querySelector(".language-control");
 const languageSelect = document.querySelector("#languageSelect");
 const dropOpenButton = document.querySelector("#dropOpenButton");
 const dropZone = document.querySelector("#dropZone");
+const dropError = document.querySelector("#dropError");
 const playerPanel = document.querySelector("#playerPanel");
 const waveformWrap = document.querySelector(".waveform-wrap");
 const canvas = document.querySelector("#waveformCanvas");
@@ -88,7 +89,7 @@ const translations = {
     audioFileUpload: "Audio file upload",
     dropAudio: "Drop an audio file here",
     privacyNote: "Your file stays private, local, and is not uploaded.",
-    supportedFormats: "Supports MP3, WAV, M4A, AAC, OGG, and FLAC.",
+    supportedFormats: "Supports common audio and video formats.",
     waveformPlayer: "Waveform player",
     noFileLoaded: "No file loaded",
     ready: "Ready",
@@ -111,10 +112,12 @@ const translations = {
     readingFile: "Reading file...",
     readingFileProgress: "Reading file... {percent}%",
     decodingAudio: "Decoding audio...",
+    extractingAudio: "Extracting audio from video...",
     buildingWaveform: "Building waveform...",
     findingSilence: "Finding long silence gaps...",
-    chooseAudioFile: "Choose an audio file.",
-    decodeError: "This file could not be decoded by the browser.",
+    chooseAudioFile: "Choose an audio or video file.",
+    unsupportedFile: "This file type is not supported. Choose a common audio or video file.",
+    decodeError: "This file could not be decoded by the browser. Try a common audio or video format.",
     silenceStatus: "{count} long silence gap{plural} detected",
   },
   es: {
@@ -148,7 +151,7 @@ const translations = {
     audioFileUpload: "Subir archivo de audio",
     dropAudio: "Suelta un archivo de audio aquí",
     privacyNote: "Tu archivo sigue siendo privado, local y no se sube.",
-    supportedFormats: "Compatible con MP3, WAV, M4A, AAC, OGG y FLAC.",
+    supportedFormats: "Compatible con formatos comunes de audio y video.",
     waveformPlayer: "Reproductor de forma de onda",
     noFileLoaded: "No hay archivo cargado",
     ready: "Listo",
@@ -171,10 +174,12 @@ const translations = {
     readingFile: "Leyendo archivo...",
     readingFileProgress: "Leyendo archivo... {percent}%",
     decodingAudio: "Decodificando audio...",
+    extractingAudio: "Extrayendo audio del video...",
     buildingWaveform: "Creando forma de onda...",
     findingSilence: "Buscando pausas largas...",
-    chooseAudioFile: "Elige un archivo de audio.",
-    decodeError: "El navegador no pudo decodificar este archivo.",
+    chooseAudioFile: "Elige un archivo de audio o video.",
+    unsupportedFile: "Este tipo de archivo no es compatible. Elige un archivo común de audio o video.",
+    decodeError: "El navegador no pudo decodificar este archivo. Prueba un formato común de audio o video.",
     silenceStatus: "Pausas largas detectadas: {count}",
   },
   fr: {
@@ -208,7 +213,7 @@ const translations = {
     audioFileUpload: "Importer un fichier audio",
     dropAudio: "Déposez un fichier audio ici",
     privacyNote: "Votre fichier reste privé, local et n’est pas envoyé.",
-    supportedFormats: "Prend en charge MP3, WAV, M4A, AAC, OGG et FLAC.",
+    supportedFormats: "Prend en charge les formats audio et vidéo courants.",
     waveformPlayer: "Lecteur de forme d’onde",
     noFileLoaded: "Aucun fichier chargé",
     ready: "Prêt",
@@ -231,10 +236,12 @@ const translations = {
     readingFile: "Lecture du fichier...",
     readingFileProgress: "Lecture du fichier... {percent}%",
     decodingAudio: "Décodage de l’audio...",
+    extractingAudio: "Extraction de l’audio de la vidéo...",
     buildingWaveform: "Création de la forme d’onde...",
     findingSilence: "Recherche des longues pauses...",
-    chooseAudioFile: "Choisissez un fichier audio.",
-    decodeError: "Ce fichier n’a pas pu être décodé par le navigateur.",
+    chooseAudioFile: "Choisissez un fichier audio ou vidéo.",
+    unsupportedFile: "Ce type de fichier n’est pas pris en charge. Choisissez un fichier audio ou vidéo courant.",
+    decodeError: "Ce fichier n’a pas pu être décodé par le navigateur. Essayez un format audio ou vidéo courant.",
     silenceStatus: "Longues pauses détectées : {count}",
   },
   de: {
@@ -268,7 +275,7 @@ const translations = {
     audioFileUpload: "Audiodatei hochladen",
     dropAudio: "Audiodatei hier ablegen",
     privacyNote: "Deine Datei bleibt privat, lokal und wird nicht hochgeladen.",
-    supportedFormats: "Unterstützt MP3, WAV, M4A, AAC, OGG und FLAC.",
+    supportedFormats: "Unterstützt gängige Audio- und Videoformate.",
     waveformPlayer: "Wellenform-Player",
     noFileLoaded: "Keine Datei geladen",
     ready: "Bereit",
@@ -291,10 +298,12 @@ const translations = {
     readingFile: "Datei wird gelesen...",
     readingFileProgress: "Datei wird gelesen... {percent}%",
     decodingAudio: "Audio wird decodiert...",
+    extractingAudio: "Audio wird aus dem Video extrahiert...",
     buildingWaveform: "Wellenform wird erstellt...",
     findingSilence: "Lange Stillepausen werden gesucht...",
-    chooseAudioFile: "Wähle eine Audiodatei.",
-    decodeError: "Diese Datei konnte vom Browser nicht decodiert werden.",
+    chooseAudioFile: "Wähle eine Audio- oder Videodatei.",
+    unsupportedFile: "Dieser Dateityp wird nicht unterstützt. Wähle eine gängige Audio- oder Videodatei.",
+    decodeError: "Diese Datei konnte vom Browser nicht decodiert werden. Versuche ein gängiges Audio- oder Videoformat.",
     silenceStatus: "Lange Stillepausen erkannt: {count}",
   },
   "pt-BR": {
@@ -328,7 +337,7 @@ const translations = {
     audioFileUpload: "Enviar arquivo de áudio",
     dropAudio: "Solte um arquivo de áudio aqui",
     privacyNote: "Seu arquivo continua privado, local e não é enviado.",
-    supportedFormats: "Compatível com MP3, WAV, M4A, AAC, OGG e FLAC.",
+    supportedFormats: "Compatível com formatos comuns de áudio e vídeo.",
     waveformPlayer: "Player de forma de onda",
     noFileLoaded: "Nenhum arquivo carregado",
     ready: "Pronto",
@@ -351,10 +360,12 @@ const translations = {
     readingFile: "Lendo arquivo...",
     readingFileProgress: "Lendo arquivo... {percent}%",
     decodingAudio: "Decodificando áudio...",
+    extractingAudio: "Extraindo áudio do vídeo...",
     buildingWaveform: "Criando forma de onda...",
     findingSilence: "Buscando pausas longas...",
-    chooseAudioFile: "Escolha um arquivo de áudio.",
-    decodeError: "Este arquivo não pôde ser decodificado pelo navegador.",
+    chooseAudioFile: "Escolha um arquivo de áudio ou vídeo.",
+    unsupportedFile: "Este tipo de arquivo não é compatível. Escolha um arquivo comum de áudio ou vídeo.",
+    decodeError: "Este arquivo não pôde ser decodificado pelo navegador. Tente um formato comum de áudio ou vídeo.",
     silenceStatus: "Pausas longas detectadas: {count}",
   },
   ru: {
@@ -388,7 +399,7 @@ const translations = {
     audioFileUpload: "Загрузка аудиофайла",
     dropAudio: "Перетащите аудиофайл сюда",
     privacyNote: "Файл остается приватным, локальным и не загружается.",
-    supportedFormats: "Поддерживаются MP3, WAV, M4A, AAC, OGG и FLAC.",
+    supportedFormats: "Поддерживаются распространенные форматы аудио и видео.",
     waveformPlayer: "Плеер формы волны",
     noFileLoaded: "Файл не загружен",
     ready: "Готово",
@@ -411,10 +422,12 @@ const translations = {
     readingFile: "Чтение файла...",
     readingFileProgress: "Чтение файла... {percent}%",
     decodingAudio: "Декодирование аудио...",
+    extractingAudio: "Извлечение аудио из видео...",
     buildingWaveform: "Построение формы волны...",
     findingSilence: "Поиск длинных пауз...",
-    chooseAudioFile: "Выберите аудиофайл.",
-    decodeError: "Браузер не смог декодировать этот файл.",
+    chooseAudioFile: "Выберите аудио- или видеофайл.",
+    unsupportedFile: "Этот тип файла не поддерживается. Выберите распространенный аудио- или видеофайл.",
+    decodeError: "Браузер не смог декодировать этот файл. Попробуйте распространенный формат аудио или видео.",
     silenceStatus: "Длинные паузы найдены: {count}",
   },
   hi: {
@@ -448,7 +461,7 @@ const translations = {
     audioFileUpload: "ऑडियो फ़ाइल अपलोड",
     dropAudio: "ऑडियो फ़ाइल यहां छोड़ें",
     privacyNote: "आपकी फ़ाइल निजी और लोकल रहती है, अपलोड नहीं होती।",
-    supportedFormats: "MP3, WAV, M4A, AAC, OGG और FLAC समर्थित हैं।",
+    supportedFormats: "सामान्य ऑडियो और वीडियो फ़ॉर्मैट समर्थित हैं।",
     waveformPlayer: "वेवफ़ॉर्म प्लेयर",
     noFileLoaded: "कोई फ़ाइल लोड नहीं है",
     ready: "तैयार",
@@ -471,10 +484,12 @@ const translations = {
     readingFile: "फ़ाइल पढ़ी जा रही है...",
     readingFileProgress: "फ़ाइल पढ़ी जा रही है... {percent}%",
     decodingAudio: "ऑडियो डिकोड हो रहा है...",
+    extractingAudio: "वीडियो से ऑडियो निकाला जा रहा है...",
     buildingWaveform: "वेवफ़ॉर्म बन रहा है...",
     findingSilence: "लंबे साइलेंस गैप ढूंढे जा रहे हैं...",
-    chooseAudioFile: "कोई ऑडियो फ़ाइल चुनें।",
-    decodeError: "ब्राउज़र इस फ़ाइल को डिकोड नहीं कर सका।",
+    chooseAudioFile: "ऑडियो या वीडियो फ़ाइल चुनें।",
+    unsupportedFile: "यह फ़ाइल प्रकार समर्थित नहीं है। सामान्य ऑडियो या वीडियो फ़ाइल चुनें।",
+    decodeError: "ब्राउज़र इस फ़ाइल को डिकोड नहीं कर सका। कोई सामान्य ऑडियो या वीडियो फ़ॉर्मैट आज़माएँ।",
     silenceStatus: "{count} लंबे साइलेंस गैप मिले",
   },
   ja: {
@@ -508,7 +523,7 @@ const translations = {
     audioFileUpload: "音声ファイルをアップロード",
     dropAudio: "ここに音声ファイルをドロップ",
     privacyNote: "ファイルはローカルでのみ処理され、アップロードされません。",
-    supportedFormats: "MP3、WAV、M4A、AAC、OGG、FLAC に対応しています。",
+    supportedFormats: "一般的な音声・動画形式に対応しています。",
     waveformPlayer: "波形プレーヤー",
     noFileLoaded: "ファイルが読み込まれていません",
     ready: "準備完了",
@@ -531,10 +546,12 @@ const translations = {
     readingFile: "ファイルを読み込み中...",
     readingFileProgress: "ファイルを読み込み中... {percent}%",
     decodingAudio: "音声をデコード中...",
+    extractingAudio: "動画から音声を抽出中...",
     buildingWaveform: "波形を作成中...",
     findingSilence: "長い無音区間を検出中...",
-    chooseAudioFile: "音声ファイルを選択してください。",
-    decodeError: "このファイルはブラウザでデコードできませんでした。",
+    chooseAudioFile: "音声または動画ファイルを選択してください。",
+    unsupportedFile: "このファイル形式には対応していません。一般的な音声または動画ファイルを選択してください。",
+    decodeError: "このファイルはブラウザでデコードできませんでした。一般的な音声または動画形式を試してください。",
     silenceStatus: "長い無音区間を{count}件検出しました",
   },
   ko: {
@@ -568,7 +585,7 @@ const translations = {
     audioFileUpload: "오디오 파일 업로드",
     dropAudio: "여기에 오디오 파일을 놓으세요",
     privacyNote: "파일은 로컬에서만 처리되며 업로드되지 않습니다.",
-    supportedFormats: "MP3, WAV, M4A, AAC, OGG, FLAC을 지원합니다.",
+    supportedFormats: "일반적인 오디오 및 비디오 형식을 지원합니다.",
     waveformPlayer: "파형 플레이어",
     noFileLoaded: "불러온 파일 없음",
     ready: "준비됨",
@@ -591,10 +608,12 @@ const translations = {
     readingFile: "파일 읽는 중...",
     readingFileProgress: "파일 읽는 중... {percent}%",
     decodingAudio: "오디오 디코딩 중...",
+    extractingAudio: "비디오에서 오디오 추출 중...",
     buildingWaveform: "파형 만드는 중...",
     findingSilence: "긴 무음 구간 찾는 중...",
-    chooseAudioFile: "오디오 파일을 선택하세요.",
-    decodeError: "이 파일은 브라우저에서 디코딩할 수 없습니다.",
+    chooseAudioFile: "오디오 또는 비디오 파일을 선택하세요.",
+    unsupportedFile: "이 파일 형식은 지원되지 않습니다. 일반적인 오디오 또는 비디오 파일을 선택하세요.",
+    decodeError: "브라우저에서 이 파일을 디코딩할 수 없습니다. 일반적인 오디오 또는 비디오 형식을 사용해 보세요.",
     silenceStatus: "긴 무음 구간 {count}개를 찾았습니다",
   },
   "zh-CN": {
@@ -628,7 +647,7 @@ const translations = {
     audioFileUpload: "上传音频文件",
     dropAudio: "将音频文件拖到这里",
     privacyNote: "你的文件只在本地处理，不会上传。",
-    supportedFormats: "支持 MP3、WAV、M4A、AAC、OGG 和 FLAC。",
+    supportedFormats: "支持常见音频和视频格式。",
     waveformPlayer: "波形播放器",
     noFileLoaded: "未加载文件",
     ready: "准备就绪",
@@ -651,10 +670,12 @@ const translations = {
     readingFile: "正在读取文件...",
     readingFileProgress: "正在读取文件... {percent}%",
     decodingAudio: "正在解码音频...",
+    extractingAudio: "正在从视频中提取音频...",
     buildingWaveform: "正在生成波形...",
     findingSilence: "正在查找较长静音段...",
-    chooseAudioFile: "请选择一个音频文件。",
-    decodeError: "浏览器无法解码此文件。",
+    chooseAudioFile: "请选择音频或视频文件。",
+    unsupportedFile: "不支持此文件类型。请选择常见的音频或视频文件。",
+    decodeError: "浏览器无法解码此文件。请尝试常见的音频或视频格式。",
     silenceStatus: "检测到 {count} 个较长静音段",
   },
   "zh-TW": {
@@ -688,7 +709,7 @@ const translations = {
     audioFileUpload: "上傳音訊檔",
     dropAudio: "將音訊檔拖放到這裡",
     privacyNote: "你的檔案只會在本機處理，不會上傳。",
-    supportedFormats: "支援 MP3、WAV、M4A、AAC、OGG 和 FLAC。",
+    supportedFormats: "支援常見音訊和影片格式。",
     waveformPlayer: "波形播放器",
     noFileLoaded: "尚未載入檔案",
     ready: "準備就緒",
@@ -711,10 +732,12 @@ const translations = {
     readingFile: "正在讀取檔案...",
     readingFileProgress: "正在讀取檔案... {percent}%",
     decodingAudio: "正在解碼音訊...",
+    extractingAudio: "正在從影片中擷取音訊...",
     buildingWaveform: "正在產生波形...",
     findingSilence: "正在尋找較長靜音段...",
-    chooseAudioFile: "請選擇一個音訊檔。",
-    decodeError: "瀏覽器無法解碼此檔案。",
+    chooseAudioFile: "請選擇音訊或影片檔。",
+    unsupportedFile: "不支援此檔案類型。請選擇常見的音訊或影片檔。",
+    decodeError: "瀏覽器無法解碼此檔案。請嘗試常見的音訊或影片格式。",
     silenceStatus: "偵測到 {count} 個較長靜音段",
   },
 };
@@ -776,6 +799,22 @@ const state = {
 const RMS_WINDOW_SECONDS = 0.05;
 const SEEK_EPSILON = 0.08;
 const ANALYSIS_CHUNK_DURATION_MS = 16;
+const SUPPORTED_AUDIO_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "oga", "ogg", "opus", "wav", "weba"]);
+const SUPPORTED_VIDEO_EXTENSIONS = new Set(["avi", "m4v", "mkv", "mov", "mp4", "webm"]);
+const RECORDED_AUDIO_MIME_TYPES = [
+  "audio/webm;codecs=opus",
+  "audio/webm",
+  "audio/ogg;codecs=opus",
+  "audio/ogg",
+  "audio/mp4",
+];
+
+class UnsupportedMediaError extends Error {
+  constructor(message = "Unsupported media file.") {
+    super(message);
+    this.name = "UnsupportedMediaError";
+  }
+}
 
 settingsButton.addEventListener("click", openSettings);
 settingsClose.addEventListener("click", closeSettings);
@@ -1003,9 +1042,11 @@ async function loadFile(file) {
   await nextPaint();
   statusText.classList.remove("is-error");
 
-  if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav|m4a|aac|ogg|flac)$/i)) {
-    setError("chooseAudioFile");
+  const mediaKind = getSupportedMediaKind(file);
+  if (!mediaKind) {
+    setError("unsupportedFile");
     setBusy(false);
+    fileInput.value = "";
     return;
   }
 
@@ -1015,10 +1056,7 @@ async function loadFile(file) {
     });
     setBusy(true, "processingAudio", "decodingAudio", {}, null);
     await nextPaint();
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContextClass();
-    const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    await audioContext.close();
+    const decodedBuffer = await decodeMediaFile(file, arrayBuffer, mediaKind);
 
     stopPlayback();
     clearAnalysisCaches();
@@ -1055,9 +1093,230 @@ async function loadFile(file) {
     setBusy(false);
   } catch (error) {
     console.error(error);
-    setError("decodeError");
+    setError(error instanceof UnsupportedMediaError ? "unsupportedFile" : "decodeError");
     setBusy(false);
+    fileInput.value = "";
   }
+}
+
+function getSupportedMediaKind(file) {
+  const mimeType = (file.type || "").toLowerCase();
+  if (mimeType.startsWith("audio/")) {
+    return "audio";
+  }
+  if (mimeType.startsWith("video/")) {
+    return "video";
+  }
+
+  const extension = getFileExtension(file.name);
+  if (SUPPORTED_AUDIO_EXTENSIONS.has(extension)) {
+    return "audio";
+  }
+  if (SUPPORTED_VIDEO_EXTENSIONS.has(extension)) {
+    return "video";
+  }
+  return "";
+}
+
+function getFileExtension(name) {
+  const match = name.toLowerCase().match(/\.([a-z0-9]+)$/);
+  return match ? match[1] : "";
+}
+
+async function decodeMediaFile(file, arrayBuffer, mediaKind) {
+  try {
+    return await decodeAudioArrayBuffer(arrayBuffer);
+  } catch (error) {
+    if (mediaKind !== "video") {
+      throw error;
+    }
+  }
+
+  setBusy(true, "processingAudio", "extractingAudio", {}, null);
+  await nextPaint();
+  return extractAudioFromVideo(file);
+}
+
+async function decodeAudioArrayBuffer(arrayBuffer) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    throw new Error("Web Audio is not supported in this browser.");
+  }
+
+  const audioContext = new AudioContextClass();
+  try {
+    const decodeBuffer = arrayBuffer.slice(0);
+    const decodedBuffer = await audioContext.decodeAudioData(decodeBuffer);
+    if (!decodedBuffer.duration || !decodedBuffer.numberOfChannels) {
+      throw new Error("Decoded media did not contain an audio track.");
+    }
+    return decodedBuffer;
+  } finally {
+    await audioContext.close().catch(() => {});
+  }
+}
+
+async function extractAudioFromVideo(file) {
+  const video = document.createElement("video");
+  const objectUrl = URL.createObjectURL(file);
+  const recordMimeType = getSupportedRecorderMimeType();
+  let stream = null;
+  let recorder = null;
+
+  video.preload = "auto";
+  video.muted = true;
+  video.playsInline = true;
+  video.style.cssText = "position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none;";
+  document.body.append(video);
+
+  try {
+    if (!canBrowserPlayVideo(file, video)) {
+      throw new UnsupportedMediaError();
+    }
+
+    video.src = objectUrl;
+    video.load();
+    await waitForMediaMetadata(video);
+
+    stream = getVideoCaptureStream(video);
+    const audioTracks = stream.getAudioTracks();
+    if (!audioTracks.length) {
+      throw new UnsupportedMediaError("The video does not expose a playable audio track.");
+    }
+
+    const audioStream = new MediaStream(audioTracks);
+    const chunks = [];
+    recorder = recordMimeType
+      ? new MediaRecorder(audioStream, { mimeType: recordMimeType })
+      : new MediaRecorder(audioStream);
+
+    const recordingFinished = new Promise((resolve, reject) => {
+      recorder.addEventListener("dataavailable", (event) => {
+        if (event.data?.size) {
+          chunks.push(event.data);
+        }
+      });
+      recorder.addEventListener("stop", resolve, { once: true });
+      recorder.addEventListener("error", () => {
+        reject(recorder.error || new Error("Could not extract audio from video."));
+      }, { once: true });
+    });
+    recordingFinished.catch(() => {});
+
+    const playbackFinished = waitForVideoPlaybackEnd(video);
+    playbackFinished.catch(() => {});
+    recorder.start(1000);
+    await video.play();
+    await playbackFinished;
+
+    if (recorder.state !== "inactive") {
+      recorder.stop();
+    }
+    await recordingFinished;
+
+    if (!chunks.length) {
+      throw new UnsupportedMediaError("No audio data could be extracted from the video.");
+    }
+
+    const extractedBlob = new Blob(chunks, { type: recorder.mimeType || recordMimeType || "audio/webm" });
+    const extractedArrayBuffer = await extractedBlob.arrayBuffer();
+    return decodeAudioArrayBuffer(extractedArrayBuffer);
+  } catch (error) {
+    if (error instanceof UnsupportedMediaError) {
+      throw error;
+    }
+    throw new Error("Could not extract audio from video.", { cause: error });
+  } finally {
+    if (recorder?.state && recorder.state !== "inactive") {
+      recorder.stop();
+    }
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    video.remove();
+    URL.revokeObjectURL(objectUrl);
+    stream?.getTracks().forEach((track) => track.stop());
+  }
+}
+
+function canBrowserPlayVideo(file, video) {
+  const mimeType = (file.type || "").toLowerCase();
+  if (mimeType && video.canPlayType(mimeType)) {
+    return true;
+  }
+
+  const extension = getFileExtension(file.name);
+  const fallbackMimeTypes = {
+    m4v: "video/mp4",
+    mkv: "video/webm",
+    mov: "video/quicktime",
+    mp4: "video/mp4",
+    webm: "video/webm",
+  };
+  const fallbackMimeType = fallbackMimeTypes[extension];
+  return Boolean(fallbackMimeType && video.canPlayType(fallbackMimeType));
+}
+
+function getVideoCaptureStream(video) {
+  const stream = video.captureStream?.() || video.mozCaptureStream?.();
+  if (!stream || typeof MediaRecorder === "undefined") {
+    throw new UnsupportedMediaError("This browser cannot extract audio from video files.");
+  }
+  return stream;
+}
+
+function getSupportedRecorderMimeType() {
+  if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported) {
+    return "";
+  }
+  return RECORDED_AUDIO_MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+function waitForMediaMetadata(video) {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("error", handleError);
+    };
+    const handleLoadedMetadata = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new UnsupportedMediaError());
+    };
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata, { once: true });
+    video.addEventListener("error", handleError, { once: true });
+  });
+}
+
+function waitForVideoPlaybackEnd(video) {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("error", handleError);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+    const handleEnded = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new UnsupportedMediaError());
+    };
+    const handleTimeUpdate = () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        setBusyProgress((video.currentTime / video.duration) * 45);
+      }
+    };
+
+    video.addEventListener("ended", handleEnded, { once: true });
+    video.addEventListener("error", handleError, { once: true });
+    video.addEventListener("timeupdate", handleTimeUpdate);
+  });
 }
 
 async function togglePlayback() {
@@ -2017,12 +2276,17 @@ function setStatus(key, params = {}) {
   state.errorKey = "";
   statusText.textContent = translate(key, params);
   statusText.classList.remove("is-error");
+  dropError.textContent = "";
+  dropError.classList.add("is-hidden");
 }
 
 function setError(key) {
   state.errorKey = key;
-  statusText.textContent = translate(key);
+  const message = translate(key);
+  statusText.textContent = message;
   statusText.classList.add("is-error");
+  dropError.textContent = message;
+  dropError.classList.toggle("is-hidden", dropZone.classList.contains("is-hidden"));
 }
 
 function getLongSilentRegions(audibleRegions) {
