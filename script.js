@@ -1,4 +1,19 @@
 const fileInput = document.querySelector("#fileInput");
+const APP_VERSION = "1.0.3";
+const APP_VERSION_CHANNEL = "";
+const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CHANNEL}` : APP_VERSION;
+window.APP_VERSION = APP_VERSION;
+window.APP_VERSION_CHANNEL = APP_VERSION_CHANNEL;
+window.APP_VERSION_LABEL = APP_VERSION_LABEL;
+const settingsButton = document.querySelector("#settingsButton");
+const settingsBackdrop = document.querySelector("#settingsBackdrop");
+const settingsModal = document.querySelector("#settingsModal");
+const settingsClose = document.querySelector("#settingsClose");
+const licenseButton = document.querySelector("#licenseButton");
+const licenseBackdrop = document.querySelector("#licenseBackdrop");
+const licenseClose = document.querySelector("#licenseClose");
+const resetSettings = document.querySelector("#resetSettings");
+const languageControl = document.querySelector(".language-control");
 const languageSelect = document.querySelector("#languageSelect");
 const dropOpenButton = document.querySelector("#dropOpenButton");
 const dropZone = document.querySelector("#dropZone");
@@ -32,10 +47,43 @@ const loadingTitle = document.querySelector("#loadingTitle");
 const loadingDetail = document.querySelector("#loadingDetail");
 const loadingProgressBar = document.querySelector("#loadingProgressBar");
 const loadingProgressTrack = document.querySelector(".progress-track");
+const colorSchemeQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+const themeOptions = [...document.querySelectorAll("input[name='themeMode']")];
+const silenceThresholdInput = document.querySelector("#silenceThresholdInput");
+const silenceThresholdValue = document.querySelector("#silenceThresholdValue");
+const minSilenceInput = document.querySelector("#minSilenceInput");
+const minSilenceValue = document.querySelector("#minSilenceValue");
+const minAudibleInput = document.querySelector("#minAudibleInput");
+const minAudibleValue = document.querySelector("#minAudibleValue");
 
 const translations = {
   en: {
     language: "Language",
+    settings: "Settings",
+    closeSettings: "Close settings",
+    closeLicenses: "Close licenses",
+    displaySettings: "Display",
+    theme: "Theme",
+    themeAuto: "Auto",
+    themeDark: "Dark",
+    themeLight: "Light",
+    detectionSettings: "Silence detection",
+    silenceThreshold: "Silence threshold",
+    minSilenceLength: "Minimum silence length",
+    minAudibleLength: "Minimum audible length",
+    keyboardShortcuts: "Keyboard shortcuts",
+    keySpace: "Space",
+    keyEscape: "Esc",
+    shortcutPlayPause: "Play or pause",
+    shortcutJumpBack: "Jump back",
+    shortcutJumpForward: "Jump forward",
+    shortcutNextSection: "Next section",
+    shortcutCloseSettings: "Close settings",
+    resetDefaults: "Reset defaults",
+    licenses: "Licenses",
+    openSourceLicenses: "Open source licenses",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols fonts are provided by Google and licensed under the Apache License, Version 2.0.",
     openAudio: "Open audio",
     audioFileUpload: "Audio file upload",
     dropAudio: "Drop an audio file here",
@@ -71,6 +119,31 @@ const translations = {
   },
   es: {
     language: "Idioma",
+    settings: "Ajustes",
+    closeSettings: "Cerrar ajustes",
+    closeLicenses: "Cerrar licencias",
+    displaySettings: "Pantalla",
+    theme: "Tema",
+    themeAuto: "Automático",
+    themeDark: "Oscuro",
+    themeLight: "Claro",
+    detectionSettings: "Detección de silencio",
+    silenceThreshold: "Umbral de silencio",
+    minSilenceLength: "Silencio mínimo",
+    minAudibleLength: "Audio mínimo",
+    keyboardShortcuts: "Atajos de teclado",
+    keySpace: "Espacio",
+    keyEscape: "Esc",
+    shortcutPlayPause: "Reproducir o pausar",
+    shortcutJumpBack: "Saltar atrás",
+    shortcutJumpForward: "Saltar adelante",
+    shortcutNextSection: "Siguiente sección",
+    shortcutCloseSettings: "Cerrar ajustes",
+    resetDefaults: "Restablecer valores",
+    licenses: "Licencias",
+    openSourceLicenses: "Licencias de código abierto",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Las fuentes Material Symbols son proporcionadas por Google y están bajo la licencia Apache, versión 2.0.",
     openAudio: "Abrir audio",
     audioFileUpload: "Subir archivo de audio",
     dropAudio: "Suelta un archivo de audio aquí",
@@ -106,6 +179,31 @@ const translations = {
   },
   fr: {
     language: "Langue",
+    settings: "Réglages",
+    closeSettings: "Fermer les réglages",
+    closeLicenses: "Fermer les licences",
+    displaySettings: "Affichage",
+    theme: "Thème",
+    themeAuto: "Auto",
+    themeDark: "Sombre",
+    themeLight: "Clair",
+    detectionSettings: "Détection du silence",
+    silenceThreshold: "Seuil de silence",
+    minSilenceLength: "Silence minimum",
+    minAudibleLength: "Audio minimum",
+    keyboardShortcuts: "Raccourcis clavier",
+    keySpace: "Espace",
+    keyEscape: "Échap",
+    shortcutPlayPause: "Lire ou mettre en pause",
+    shortcutJumpBack: "Reculer",
+    shortcutJumpForward: "Avancer",
+    shortcutNextSection: "Section suivante",
+    shortcutCloseSettings: "Fermer les réglages",
+    resetDefaults: "Réinitialiser",
+    licenses: "Licences",
+    openSourceLicenses: "Licences open source",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Les polices Material Symbols sont fournies par Google et sous licence Apache, version 2.0.",
     openAudio: "Ouvrir un audio",
     audioFileUpload: "Importer un fichier audio",
     dropAudio: "Déposez un fichier audio ici",
@@ -141,6 +239,31 @@ const translations = {
   },
   de: {
     language: "Sprache",
+    settings: "Einstellungen",
+    closeSettings: "Einstellungen schließen",
+    closeLicenses: "Lizenzen schließen",
+    displaySettings: "Anzeige",
+    theme: "Design",
+    themeAuto: "Automatisch",
+    themeDark: "Dunkel",
+    themeLight: "Hell",
+    detectionSettings: "Stilleerkennung",
+    silenceThreshold: "Stille-Schwelle",
+    minSilenceLength: "Mindeststille",
+    minAudibleLength: "Mindestaudio",
+    keyboardShortcuts: "Tastenkürzel",
+    keySpace: "Leertaste",
+    keyEscape: "Esc",
+    shortcutPlayPause: "Abspielen oder pausieren",
+    shortcutJumpBack: "Zurückspringen",
+    shortcutJumpForward: "Vorspringen",
+    shortcutNextSection: "Nächster Abschnitt",
+    shortcutCloseSettings: "Einstellungen schließen",
+    resetDefaults: "Zurücksetzen",
+    licenses: "Lizenzen",
+    openSourceLicenses: "Open-Source-Lizenzen",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols-Schriften werden von Google bereitgestellt und unter der Apache-Lizenz, Version 2.0, lizenziert.",
     openAudio: "Audio öffnen",
     audioFileUpload: "Audiodatei hochladen",
     dropAudio: "Audiodatei hier ablegen",
@@ -176,6 +299,31 @@ const translations = {
   },
   "pt-BR": {
     language: "Idioma",
+    settings: "Configurações",
+    closeSettings: "Fechar configurações",
+    closeLicenses: "Fechar licenças",
+    displaySettings: "Exibição",
+    theme: "Tema",
+    themeAuto: "Auto",
+    themeDark: "Escuro",
+    themeLight: "Claro",
+    detectionSettings: "Detecção de silêncio",
+    silenceThreshold: "Limiar de silêncio",
+    minSilenceLength: "Silêncio mínimo",
+    minAudibleLength: "Áudio mínimo",
+    keyboardShortcuts: "Atalhos de teclado",
+    keySpace: "Espaço",
+    keyEscape: "Esc",
+    shortcutPlayPause: "Reproduzir ou pausar",
+    shortcutJumpBack: "Voltar",
+    shortcutJumpForward: "Avançar",
+    shortcutNextSection: "Próxima seção",
+    shortcutCloseSettings: "Fechar configurações",
+    resetDefaults: "Restaurar padrões",
+    licenses: "Licenças",
+    openSourceLicenses: "Licenças de código aberto",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "As fontes Material Symbols são fornecidas pelo Google e licenciadas sob a Licença Apache, versão 2.0.",
     openAudio: "Abrir áudio",
     audioFileUpload: "Enviar arquivo de áudio",
     dropAudio: "Solte um arquivo de áudio aqui",
@@ -211,6 +359,31 @@ const translations = {
   },
   ru: {
     language: "Язык",
+    settings: "Настройки",
+    closeSettings: "Закрыть настройки",
+    closeLicenses: "Закрыть лицензии",
+    displaySettings: "Отображение",
+    theme: "Тема",
+    themeAuto: "Авто",
+    themeDark: "Темная",
+    themeLight: "Светлая",
+    detectionSettings: "Определение тишины",
+    silenceThreshold: "Порог тишины",
+    minSilenceLength: "Минимальная тишина",
+    minAudibleLength: "Минимальный звук",
+    keyboardShortcuts: "Горячие клавиши",
+    keySpace: "Пробел",
+    keyEscape: "Esc",
+    shortcutPlayPause: "Воспроизвести или пауза",
+    shortcutJumpBack: "Назад",
+    shortcutJumpForward: "Вперед",
+    shortcutNextSection: "Следующий участок",
+    shortcutCloseSettings: "Закрыть настройки",
+    resetDefaults: "Сбросить настройки",
+    licenses: "Лицензии",
+    openSourceLicenses: "Лицензии открытого кода",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Шрифты Material Symbols предоставляются Google и лицензируются по лицензии Apache версии 2.0.",
     openAudio: "Открыть аудио",
     audioFileUpload: "Загрузка аудиофайла",
     dropAudio: "Перетащите аудиофайл сюда",
@@ -246,6 +419,31 @@ const translations = {
   },
   hi: {
     language: "भाषा",
+    settings: "सेटिंग्स",
+    closeSettings: "सेटिंग्स बंद करें",
+    closeLicenses: "लाइसेंस बंद करें",
+    displaySettings: "डिस्प्ले",
+    theme: "थीम",
+    themeAuto: "ऑटो",
+    themeDark: "डार्क",
+    themeLight: "लाइट",
+    detectionSettings: "साइलेंस डिटेक्शन",
+    silenceThreshold: "साइलेंस थ्रेशहोल्ड",
+    minSilenceLength: "न्यूनतम साइलेंस",
+    minAudibleLength: "न्यूनतम ऑडियो",
+    keyboardShortcuts: "कीबोर्ड शॉर्टकट",
+    keySpace: "स्पेस",
+    keyEscape: "Esc",
+    shortcutPlayPause: "चलाएं या रोकें",
+    shortcutJumpBack: "पीछे जाएं",
+    shortcutJumpForward: "आगे जाएं",
+    shortcutNextSection: "अगला सेक्शन",
+    shortcutCloseSettings: "सेटिंग्स बंद करें",
+    resetDefaults: "डिफ़ॉल्ट रीसेट करें",
+    licenses: "लाइसेंस",
+    openSourceLicenses: "ओपन सोर्स लाइसेंस",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols फ़ॉन्ट Google द्वारा प्रदान किए जाते हैं और Apache License, Version 2.0 के तहत लाइसेंस प्राप्त हैं।",
     openAudio: "ऑडियो खोलें",
     audioFileUpload: "ऑडियो फ़ाइल अपलोड",
     dropAudio: "ऑडियो फ़ाइल यहां छोड़ें",
@@ -281,6 +479,31 @@ const translations = {
   },
   ja: {
     language: "言語",
+    settings: "設定",
+    closeSettings: "設定を閉じる",
+    closeLicenses: "ライセンスを閉じる",
+    displaySettings: "表示",
+    theme: "テーマ",
+    themeAuto: "自動",
+    themeDark: "ダーク",
+    themeLight: "ライト",
+    detectionSettings: "無音検出",
+    silenceThreshold: "無音しきい値",
+    minSilenceLength: "最短無音時間",
+    minAudibleLength: "最短有音時間",
+    keyboardShortcuts: "キーボードショートカット",
+    keySpace: "スペース",
+    keyEscape: "Esc",
+    shortcutPlayPause: "再生または一時停止",
+    shortcutJumpBack: "戻る",
+    shortcutJumpForward: "進む",
+    shortcutNextSection: "次の区間",
+    shortcutCloseSettings: "設定を閉じる",
+    resetDefaults: "初期値に戻す",
+    licenses: "ライセンス",
+    openSourceLicenses: "オープンソースライセンス",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols フォントは Google により提供され、Apache License, Version 2.0 のもとでライセンスされています。",
     openAudio: "音声を開く",
     audioFileUpload: "音声ファイルをアップロード",
     dropAudio: "ここに音声ファイルをドロップ",
@@ -316,6 +539,31 @@ const translations = {
   },
   ko: {
     language: "언어",
+    settings: "설정",
+    closeSettings: "설정 닫기",
+    closeLicenses: "라이선스 닫기",
+    displaySettings: "화면",
+    theme: "테마",
+    themeAuto: "자동",
+    themeDark: "어둡게",
+    themeLight: "밝게",
+    detectionSettings: "무음 감지",
+    silenceThreshold: "무음 임계값",
+    minSilenceLength: "최소 무음 길이",
+    minAudibleLength: "최소 오디오 길이",
+    keyboardShortcuts: "키보드 단축키",
+    keySpace: "스페이스",
+    keyEscape: "Esc",
+    shortcutPlayPause: "재생 또는 일시정지",
+    shortcutJumpBack: "뒤로 이동",
+    shortcutJumpForward: "앞으로 이동",
+    shortcutNextSection: "다음 구간",
+    shortcutCloseSettings: "설정 닫기",
+    resetDefaults: "기본값 재설정",
+    licenses: "라이선스",
+    openSourceLicenses: "오픈소스 라이선스",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols 글꼴은 Google에서 제공하며 Apache License, Version 2.0에 따라 라이선스됩니다.",
     openAudio: "오디오 열기",
     audioFileUpload: "오디오 파일 업로드",
     dropAudio: "여기에 오디오 파일을 놓으세요",
@@ -351,6 +599,31 @@ const translations = {
   },
   "zh-CN": {
     language: "语言",
+    settings: "设置",
+    closeSettings: "关闭设置",
+    closeLicenses: "关闭许可证",
+    displaySettings: "显示",
+    theme: "主题",
+    themeAuto: "自动",
+    themeDark: "深色",
+    themeLight: "浅色",
+    detectionSettings: "静音检测",
+    silenceThreshold: "静音阈值",
+    minSilenceLength: "最短静音时长",
+    minAudibleLength: "最短有声时长",
+    keyboardShortcuts: "键盘快捷键",
+    keySpace: "空格",
+    keyEscape: "Esc",
+    shortcutPlayPause: "播放或暂停",
+    shortcutJumpBack: "向后跳转",
+    shortcutJumpForward: "向前跳转",
+    shortcutNextSection: "下一段",
+    shortcutCloseSettings: "关闭设置",
+    resetDefaults: "恢复默认",
+    licenses: "许可证",
+    openSourceLicenses: "开源许可证",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols 字体由 Google 提供，并根据 Apache License, Version 2.0 授权。",
     openAudio: "打开音频",
     audioFileUpload: "上传音频文件",
     dropAudio: "将音频文件拖到这里",
@@ -386,6 +659,31 @@ const translations = {
   },
   "zh-TW": {
     language: "語言",
+    settings: "設定",
+    closeSettings: "關閉設定",
+    closeLicenses: "關閉授權條款",
+    displaySettings: "顯示",
+    theme: "主題",
+    themeAuto: "自動",
+    themeDark: "深色",
+    themeLight: "淺色",
+    detectionSettings: "靜音偵測",
+    silenceThreshold: "靜音閾值",
+    minSilenceLength: "最短靜音長度",
+    minAudibleLength: "最短有聲長度",
+    keyboardShortcuts: "鍵盤快捷鍵",
+    keySpace: "空白鍵",
+    keyEscape: "Esc",
+    shortcutPlayPause: "播放或暫停",
+    shortcutJumpBack: "向後跳轉",
+    shortcutJumpForward: "向前跳轉",
+    shortcutNextSection: "下一段",
+    shortcutCloseSettings: "關閉設定",
+    resetDefaults: "恢復預設",
+    licenses: "授權條款",
+    openSourceLicenses: "開源授權條款",
+    materialSymbolsLicense: "Material Symbols",
+    materialSymbolsLicenseSummary: "Material Symbols 字型由 Google 提供，並依 Apache License, Version 2.0 授權。",
     openAudio: "開啟音訊",
     audioFileUpload: "上傳音訊檔",
     dropAudio: "將音訊檔拖放到這裡",
@@ -421,8 +719,25 @@ const translations = {
   },
 };
 
+const STORAGE_KEY = "audioNavigatorSettings";
+const DEFAULT_SETTINGS = {
+  theme: "auto",
+  silenceThreshold: 0.01,
+  minSilenceSeconds: 12,
+  minAudibleSeconds: 0.2,
+};
+const languagePreference = getLanguagePreference();
+const savedSettings = getSavedSettings(languagePreference.language);
+
 const state = {
-  language: getPreferredLanguage(),
+  language: savedSettings.language,
+  hasSupportedBrowserLanguage: languagePreference.isSupported,
+  settings: {
+    theme: savedSettings.theme,
+    silenceThreshold: savedSettings.silenceThreshold,
+    minSilenceSeconds: savedSettings.minSilenceSeconds,
+    minAudibleSeconds: savedSettings.minAudibleSeconds,
+  },
   audioBuffer: null,
   mediaDuration: 0,
   monoSamples: null,
@@ -459,12 +774,39 @@ const state = {
 };
 
 const RMS_WINDOW_SECONDS = 0.05;
-const MIN_AUDIBLE_SECONDS = 0.2;
-const MIN_SILENCE_SECONDS = 12;
 const SEEK_EPSILON = 0.08;
 const ANALYSIS_CHUNK_DURATION_MS = 16;
 
-document.querySelector(".language-control").addEventListener("click", (event) => {
+settingsButton.addEventListener("click", openSettings);
+settingsClose.addEventListener("click", closeSettings);
+licenseButton.addEventListener("click", openLicenses);
+licenseClose.addEventListener("click", closeLicenses);
+settingsBackdrop.addEventListener("click", (event) => {
+  if (event.target === settingsBackdrop) {
+    closeSettings();
+  }
+});
+licenseBackdrop.addEventListener("click", (event) => {
+  if (event.target === licenseBackdrop) {
+    closeLicenses();
+  }
+});
+
+themeOptions.forEach((option) => {
+  option.addEventListener("change", () => {
+    if (option.checked) {
+      setTheme(option.value);
+    }
+  });
+});
+
+[silenceThresholdInput, minSilenceInput, minAudibleInput].forEach((input) => {
+  input.addEventListener("input", updateDetectionSetting);
+});
+
+resetSettings.addEventListener("click", resetDefaultSettings);
+
+languageControl.addEventListener("click", (event) => {
   if (event.target.closest(".custom-menu")) {
     return;
   }
@@ -573,6 +915,14 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
+    if (isLicensesOpen()) {
+      closeLicenses();
+      return;
+    }
+    if (isSettingsOpen()) {
+      closeSettings();
+      return;
+    }
     setJumpMenuOpen(false);
     setLanguageMenuOpen(false);
     if (document.activeElement?.closest(".jump-amount-wrap")) {
@@ -582,6 +932,12 @@ document.addEventListener("keydown", (event) => {
     }
   }
 });
+
+if (colorSchemeQuery?.addEventListener) {
+  colorSchemeQuery.addEventListener("change", handleColorSchemeChange);
+} else if (colorSchemeQuery?.addListener) {
+  colorSchemeQuery.addListener(handleColorSchemeChange);
+}
 
 speedSlider.addEventListener("input", updatePlaybackSpeed);
 
@@ -635,6 +991,9 @@ waveformWrap.addEventListener("contextmenu", (event) => {
 
 window.addEventListener("resize", scheduleResizeCanvas);
 document.addEventListener("keydown", handleKeyboardControls);
+applyTheme();
+syncSettingsControls();
+syncAppVersion();
 setLanguage(state.language, false);
 applyLanguage();
 
@@ -714,7 +1073,7 @@ async function togglePlayback() {
 }
 
 function handleKeyboardControls(event) {
-  if (event.defaultPrevented || shouldIgnoreShortcut(event.target) || !state.audioBuffer) {
+  if (event.defaultPrevented || isSettingsOpen() || shouldIgnoreShortcut(event.target) || !state.audioBuffer) {
     return;
   }
 
@@ -841,13 +1200,7 @@ function collectMonoSamples(buffer) {
 }
 
 function updateAutoThreshold() {
-  const sorted = state.rmsFrames.map((frame) => frame.rms).sort((a, b) => a - b);
-  const quiet = sorted[Math.floor(sorted.length * 0.2)] || 0;
-  const median = sorted[Math.floor(sorted.length * 0.6)] || 0;
-  const loud = sorted[Math.floor(sorted.length * 0.9)] || median;
-  const adaptiveThreshold = quiet + (median - quiet) * 0.65;
-  const lowSoundThreshold = loud * 0.035;
-  state.threshold = Math.max(0.01, adaptiveThreshold, lowSoundThreshold);
+  state.threshold = state.settings.silenceThreshold;
 }
 
 function analyzeRegions() {
@@ -874,12 +1227,12 @@ function analyzeRegions() {
   const audibleRegions = [];
 
   rawRegions.forEach((region) => {
-    if (region.end - region.start < MIN_AUDIBLE_SECONDS) {
+    if (region.end - region.start < state.settings.minAudibleSeconds) {
       return;
     }
 
     const previous = audibleRegions[audibleRegions.length - 1];
-    if (previous && region.start - previous.end < MIN_SILENCE_SECONDS) {
+    if (previous && region.start - previous.end < state.settings.minSilenceSeconds) {
       previous.end = region.end;
     } else {
       audibleRegions.push({ ...region });
@@ -954,7 +1307,7 @@ function renderStaticWaveform(width, height) {
   staticCanvas.height = height;
 
   staticCtx.clearRect(0, 0, width, height);
-  staticCtx.fillStyle = "#f8f9fc";
+  staticCtx.fillStyle = getThemeColor("--canvas-bg");
   staticCtx.fillRect(0, 0, width, height);
 
   if (!state.audioBuffer || !state.peaks.length) {
@@ -968,7 +1321,7 @@ function renderStaticWaveform(width, height) {
 
 function drawGrid(context, width, height) {
   const centerY = height / 2;
-  context.strokeStyle = "#e4e8f0";
+  context.strokeStyle = getThemeColor("--canvas-grid");
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(0, centerY);
@@ -978,7 +1331,7 @@ function drawGrid(context, width, height) {
 
 function drawSilence(context, width, height) {
   const duration = getAnalysisDuration();
-  context.fillStyle = "rgba(226, 231, 241, 0.72)";
+  context.fillStyle = getThemeColor("--canvas-silence");
 
   state.silentRegions.forEach((region) => {
     const x = (region.start / duration) * width;
@@ -1016,10 +1369,10 @@ function drawEnvelope(context, width, height) {
   });
 
   context.closePath();
-  context.fillStyle = "#526AF2";
+  context.fillStyle = getThemeColor("--waveform");
   context.fill();
 
-  context.strokeStyle = "#526AF2";
+  context.strokeStyle = getThemeColor("--waveform");
   context.lineWidth = Math.max(1, window.devicePixelRatio || 1);
   context.stroke();
 }
@@ -1031,7 +1384,7 @@ function drawPlayhead(context, width, height) {
   }
 
   const x = (getCurrentTime() / duration) * width;
-  context.strokeStyle = "#181817";
+  context.strokeStyle = getThemeColor("--playhead");
   context.lineWidth = Math.max(2, (window.devicePixelRatio || 1) * 1.5);
   context.beginPath();
   context.moveTo(x, 0);
@@ -1113,6 +1466,13 @@ function getMediaDuration() {
 
 function clampTime(seconds, duration) {
   return Math.min(Math.max(seconds || 0, 0), duration);
+}
+
+function clampNumber(value, min, max) {
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+  return Math.min(Math.max(value, min), max);
 }
 
 function getFiniteDuration(duration) {
@@ -1305,7 +1665,136 @@ function setLanguage(language, shouldApply = true) {
 
   if (shouldApply) {
     applyLanguage();
+    persistSettings();
   }
+}
+
+function openSettings() {
+  settingsBackdrop.classList.remove("is-hidden");
+  settingsBackdrop.setAttribute("aria-hidden", "false");
+  setLanguageMenuOpen(false);
+  setJumpMenuOpen(false);
+  settingsClose.focus();
+}
+
+function closeSettings() {
+  closeLicenses({ restoreFocus: false });
+  settingsBackdrop.classList.add("is-hidden");
+  settingsBackdrop.setAttribute("aria-hidden", "true");
+  setLanguageMenuOpen(false);
+  settingsButton.focus();
+}
+
+function isSettingsOpen() {
+  return !settingsBackdrop.classList.contains("is-hidden");
+}
+
+function openLicenses() {
+  licenseBackdrop.classList.remove("is-hidden");
+  licenseBackdrop.setAttribute("aria-hidden", "false");
+  setLanguageMenuOpen(false);
+  setJumpMenuOpen(false);
+  licenseClose.focus();
+}
+
+function closeLicenses({ restoreFocus = true } = {}) {
+  if (!isLicensesOpen()) {
+    return;
+  }
+
+  licenseBackdrop.classList.add("is-hidden");
+  licenseBackdrop.setAttribute("aria-hidden", "true");
+
+  if (restoreFocus) {
+    licenseButton.focus();
+  }
+}
+
+function isLicensesOpen() {
+  return !licenseBackdrop.classList.contains("is-hidden");
+}
+
+function setTheme(theme) {
+  state.settings.theme = ["auto", "dark", "light"].includes(theme) ? theme : DEFAULT_SETTINGS.theme;
+  applyTheme();
+  syncThemeControls();
+  persistSettings();
+}
+
+function applyTheme() {
+  if (state.settings.theme === "auto") {
+    document.documentElement.removeAttribute("data-theme");
+  } else {
+    document.documentElement.dataset.theme = state.settings.theme;
+  }
+  handleColorSchemeChange();
+}
+
+function syncSettingsControls() {
+  syncThemeControls();
+  silenceThresholdInput.value = String(state.settings.silenceThreshold);
+  minSilenceInput.value = String(state.settings.minSilenceSeconds);
+  minAudibleInput.value = String(state.settings.minAudibleSeconds);
+  updateSettingsOutputs();
+}
+
+function syncAppVersion() {
+  document.querySelectorAll("[data-app-version]").forEach((element) => {
+    element.textContent = APP_VERSION_LABEL;
+  });
+}
+
+function syncThemeControls() {
+  themeOptions.forEach((option) => {
+    option.checked = option.value === state.settings.theme;
+  });
+}
+
+function updateDetectionSetting() {
+  state.settings.silenceThreshold = clampNumber(Number(silenceThresholdInput.value), 0.005, 0.08);
+  state.settings.minSilenceSeconds = clampNumber(Number(minSilenceInput.value), 1, 30);
+  state.settings.minAudibleSeconds = clampNumber(Number(minAudibleInput.value), 0.1, 3);
+  updateSettingsOutputs();
+  persistSettings();
+  reanalyzeSilenceSettings();
+}
+
+function updateSettingsOutputs() {
+  silenceThresholdValue.textContent = state.settings.silenceThreshold.toFixed(3);
+  minSilenceValue.textContent = `${state.settings.minSilenceSeconds.toFixed(0)}s`;
+  minAudibleValue.textContent = `${state.settings.minAudibleSeconds.toFixed(1)}s`;
+  updateRangeFill(silenceThresholdInput);
+  updateRangeFill(minSilenceInput);
+  updateRangeFill(minAudibleInput);
+}
+
+function resetDefaultSettings() {
+  const fallbackLanguage = getLanguagePreference().language;
+  state.settings = { ...DEFAULT_SETTINGS };
+  setLanguage(fallbackLanguage, false);
+  applyTheme();
+  syncSettingsControls();
+  applyLanguage();
+  persistSettings();
+  reanalyzeSilenceSettings();
+}
+
+function reanalyzeSilenceSettings() {
+  if (!state.audioBuffer || !state.rmsFrames.length) {
+    return;
+  }
+  updateAutoThreshold();
+  analyzeRegions();
+  drawWaveform();
+}
+
+function handleColorSchemeChange() {
+  clearWaveformCache();
+  drawWaveform();
+}
+
+function getThemeColor(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 function setJumpMenuOpen(isOpen) {
@@ -1334,6 +1823,10 @@ function handleJumpOptionKeydown(event, option) {
 }
 
 function setLanguageMenuOpen(isOpen) {
+  if (languageControl.classList.contains("is-hidden")) {
+    isOpen = false;
+  }
+
   languageMenu.classList.toggle("is-hidden", !isOpen);
   languageSelect.setAttribute("aria-expanded", String(isOpen));
 }
@@ -1393,27 +1886,77 @@ function translate(key, params = {}) {
   );
 }
 
-function getPreferredLanguage() {
+function getLanguagePreference() {
   const supportedLanguages = Object.keys(translations);
   const preferredLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
 
   for (const language of preferredLanguages) {
-    if (!language) {
-      continue;
-    }
-
-    if (supportedLanguages.includes(language)) {
-      return language;
-    }
-
-    const baseLanguage = language.split("-")[0];
-    const match = supportedLanguages.find((item) => item === baseLanguage || item.startsWith(`${baseLanguage}-`));
+    const match = getSupportedLanguage(language, supportedLanguages);
     if (match) {
-      return match;
+      return {
+        language: match,
+        isSupported: true,
+      };
     }
   }
 
-  return "en";
+  return {
+    language: "en",
+    isSupported: false,
+  };
+}
+
+function getSupportedLanguage(language, supportedLanguages) {
+  if (!language) {
+    return "";
+  }
+
+  const normalizedLanguage = language.trim();
+  if (supportedLanguages.includes(normalizedLanguage)) {
+    return normalizedLanguage;
+  }
+
+  const baseLanguage = normalizedLanguage.split("-")[0];
+  return supportedLanguages.find((item) => item === baseLanguage || item.startsWith(`${baseLanguage}-`)) || "";
+}
+
+function getSavedSettings(defaultLanguage) {
+  const fallback = {
+    ...DEFAULT_SETTINGS,
+    language: defaultLanguage,
+  };
+
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    const language = translations[stored.language] ? stored.language : fallback.language;
+    const theme = ["auto", "dark", "light"].includes(stored.theme) ? stored.theme : fallback.theme;
+    return {
+      language,
+      theme,
+      silenceThreshold: clampNumber(Number(stored.silenceThreshold ?? fallback.silenceThreshold), 0.005, 0.08),
+      minSilenceSeconds: clampNumber(Number(stored.minSilenceSeconds ?? fallback.minSilenceSeconds), 1, 30),
+      minAudibleSeconds: clampNumber(Number(stored.minAudibleSeconds ?? fallback.minAudibleSeconds), 0.1, 3),
+    };
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function persistSettings() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        language: state.language,
+        theme: state.settings.theme,
+        silenceThreshold: state.settings.silenceThreshold,
+        minSilenceSeconds: state.settings.minSilenceSeconds,
+        minAudibleSeconds: state.settings.minAudibleSeconds,
+      }),
+    );
+  } catch (error) {
+    // Storage can be unavailable in restrictive browser contexts.
+  }
 }
 
 function applyLanguage() {
@@ -1488,13 +2031,13 @@ function getLongSilentRegions(audibleRegions) {
   let cursor = 0;
 
   audibleRegions.forEach((region) => {
-    if (region.start - cursor >= MIN_SILENCE_SECONDS) {
+    if (region.start - cursor >= state.settings.minSilenceSeconds) {
       silentRegions.push({ start: cursor, end: region.start });
     }
     cursor = Math.max(cursor, region.end);
   });
 
-  if (duration - cursor >= MIN_SILENCE_SECONDS) {
+  if (duration - cursor >= state.settings.minSilenceSeconds) {
     silentRegions.push({ start: cursor, end: duration });
   }
 
