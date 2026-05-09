@@ -56,32 +56,6 @@ const minSilenceInput = document.querySelector("#minSilenceInput");
 const minSilenceValue = document.querySelector("#minSilenceValue");
 const minAudibleInput = document.querySelector("#minAudibleInput");
 const minAudibleValue = document.querySelector("#minAudibleValue");
-const transcriptionSettingsSection = document.querySelector("#transcriptionSettingsSection");
-const transcriptionEnabledInput = document.querySelector("#transcriptionEnabledInput");
-const transcriptionLanguageSelect = document.querySelector("#transcriptionLanguageSelect");
-const transcriptionLanguageControl = document.querySelector("#transcriptionLanguageControl");
-const transcriptionLanguageValue = document.querySelector(".transcription-language-value");
-const transcriptionLanguageMenu = document.querySelector("#transcriptionLanguageMenu");
-const transcriptionLanguageOptions = [...document.querySelectorAll("#transcriptionLanguageMenu [role='option']")];
-const sttWebGpuState = document.querySelector("#sttWebGpuState");
-const sttModelState = document.querySelector("#sttModelState");
-const sttModelStateText = document.querySelector("#sttModelStateText");
-const sttStateList = document.querySelector(".stt-state-list");
-const sttModelActions = document.querySelector("#sttModelActions");
-const downloadModelButton = document.querySelector("#downloadModelButton");
-const sttSettingsStatus = document.querySelector("#sttSettingsStatus");
-const sttUnsupportedMessage = document.querySelector("#sttUnsupportedMessage");
-const transcribeButton = document.querySelector("#transcribeButton");
-const transcriptButton = document.querySelector("#transcriptButton");
-const subtitleButton = document.querySelector("#subtitleButton");
-const transcriptStatus = document.querySelector("#transcriptStatus");
-const transcriptBackdrop = document.querySelector("#transcriptBackdrop");
-const transcriptClose = document.querySelector("#transcriptClose");
-const transcriptList = document.querySelector("#transcriptList");
-const subtitleWindow = document.querySelector("#subtitleWindow");
-const subtitleDragHandle = document.querySelector("#subtitleDragHandle");
-const subtitleClose = document.querySelector("#subtitleClose");
-const subtitleText = document.querySelector("#subtitleText");
 
 const translations = {
   en: {
@@ -145,49 +119,6 @@ const translations = {
     unsupportedFile: "This file type is not supported. Choose a common audio or video file.",
     decodeError: "This file could not be decoded by the browser. Try a common audio or video format.",
     silenceStatus: "{count} long silence gap{plural} detected",
-    transcriptionSettings: "Transcription",
-    enableTranscription: "Enable transcription",
-    transcriptionLanguage: "Transcription language",
-    transcriptionAuto: "Auto",
-    transcriptionEnglish: "English",
-    transcriptionChinese: "Chinese",
-    transcriptionJapanese: "Japanese",
-    transcriptionKorean: "Korean",
-    transcriptionSpanish: "Spanish",
-    transcriptionFrench: "French",
-    transcriptionGerman: "German",
-    transcriptionPortuguese: "Portuguese",
-    transcriptionRussian: "Russian",
-    transcriptionHindi: "Hindi",
-    sttCapability: "Capability",
-    sttModel: "Model",
-    sttWebGpuSupported: "WebGPU supported",
-    sttWebGpuUnsupported: "WebGPU not supported",
-    sttModelDownloaded: "Model downloaded",
-    sttModelNotDownloaded: "Model not downloaded",
-    sttUnsupportedMessage: "Transcription is not supported on this device/browser.",
-    transcribe: "Transcribe",
-    transcript: "Transcript",
-    subtitles: "Subtitles",
-    closeTranscript: "Close transcript",
-    closeSubtitles: "Close subtitles",
-    transcriptEmpty: "No transcript yet.",
-    transcriptReady: "Transcript ready",
-    transcriptCached: "Transcript restored from local cache",
-    downloadModel: "Download model",
-    downloadModelFirst: "Download the model before enabling transcription.",
-    sttPreparing: "Preparing transcription...",
-    sttHashingFile: "Hashing file...",
-    sttDownloadingModel: "Downloading model: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Downloading model: {loaded} MB",
-    sttVerifyingModel: "Verifying model...",
-    sttModelMismatch: "Downloaded model did not match the expected checksum.",
-    sttModelUnavailable: "Model download is unavailable. Check the static model host.",
-    sttPlanningChunks: "Planning transcript chunks...",
-    sttTranscribing: "Transcribing {current} / {total} chunks ({percent}%)",
-    sttNoSpeech: "No speech found to transcribe.",
-    sttFailed: "Transcription failed. Try again with a shorter file.",
-    subtitlePlaceholder: "Subtitles will appear during playback.",
   },
   es: {
     language: "Idioma",
@@ -811,467 +742,12 @@ const translations = {
   },
 };
 
-const sttTranslations = {
-  es: {
-    transcriptionSettings: "Transcripción",
-    enableTranscription: "Activar transcripción",
-    transcriptionLanguage: "Idioma de transcripción",
-    transcriptionAuto: "Auto",
-    transcriptionEnglish: "Inglés",
-    transcriptionChinese: "Chino",
-    transcriptionJapanese: "Japonés",
-    transcriptionKorean: "Coreano",
-    transcriptionSpanish: "Español",
-    transcriptionFrench: "Francés",
-    transcriptionGerman: "Alemán",
-    transcriptionPortuguese: "Portugués",
-    transcriptionRussian: "Ruso",
-    transcriptionHindi: "Hindi",
-    sttCapability: "Capacidad",
-    sttModel: "Modelo",
-    sttWebGpuSupported: "WebGPU compatible",
-    sttWebGpuUnsupported: "WebGPU no compatible",
-    sttModelDownloaded: "Modelo descargado",
-    sttModelNotDownloaded: "Modelo no descargado",
-    sttUnsupportedMessage: "La transcripción no es compatible con este dispositivo o navegador.",
-    transcribe: "Transcribir",
-    transcript: "Transcripción",
-    subtitles: "Subtítulos",
-    closeTranscript: "Cerrar transcripción",
-    closeSubtitles: "Cerrar subtítulos",
-    transcriptEmpty: "Aún no hay transcripción.",
-    transcriptReady: "Transcripción lista",
-    transcriptCached: "Transcripción restaurada desde la caché local",
-    downloadModel: "Descargar modelo",
-    downloadModelFirst: "Descarga el modelo antes de activar la transcripción.",
-    sttPreparing: "Preparando transcripción...",
-    sttHashingFile: "Calculando hash del archivo...",
-    sttDownloadingModel: "Descargando modelo: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Descargando modelo: {loaded} MB",
-    sttVerifyingModel: "Verificando modelo...",
-    sttModelMismatch: "El modelo descargado no coincide con la suma esperada.",
-    sttModelUnavailable: "La descarga del modelo no está disponible. Revisa el host estático.",
-    sttPlanningChunks: "Preparando fragmentos...",
-    sttTranscribing: "Transcribiendo {current} / {total} fragmentos ({percent}%)",
-    sttNoSpeech: "No se encontró voz para transcribir.",
-    sttFailed: "La transcripción falló. Prueba con un archivo más corto.",
-    subtitlePlaceholder: "Los subtítulos aparecerán durante la reproducción.",
-  },
-  fr: {
-    transcriptionSettings: "Transcription",
-    enableTranscription: "Activer la transcription",
-    transcriptionLanguage: "Langue de transcription",
-    transcriptionAuto: "Auto",
-    transcriptionEnglish: "Anglais",
-    transcriptionChinese: "Chinois",
-    transcriptionJapanese: "Japonais",
-    transcriptionKorean: "Coréen",
-    transcriptionSpanish: "Espagnol",
-    transcriptionFrench: "Français",
-    transcriptionGerman: "Allemand",
-    transcriptionPortuguese: "Portugais",
-    transcriptionRussian: "Russe",
-    transcriptionHindi: "Hindi",
-    sttCapability: "Capacité",
-    sttModel: "Modèle",
-    sttWebGpuSupported: "WebGPU pris en charge",
-    sttWebGpuUnsupported: "WebGPU non pris en charge",
-    sttModelDownloaded: "Modèle téléchargé",
-    sttModelNotDownloaded: "Modèle non téléchargé",
-    sttUnsupportedMessage: "La transcription n’est pas prise en charge sur cet appareil ou navigateur.",
-    transcribe: "Transcrire",
-    transcript: "Transcription",
-    subtitles: "Sous-titres",
-    closeTranscript: "Fermer la transcription",
-    closeSubtitles: "Fermer les sous-titres",
-    transcriptEmpty: "Aucune transcription pour le moment.",
-    transcriptReady: "Transcription prête",
-    transcriptCached: "Transcription restaurée depuis le cache local",
-    downloadModel: "Télécharger le modèle",
-    downloadModelFirst: "Téléchargez le modèle avant d’activer la transcription.",
-    sttPreparing: "Préparation de la transcription...",
-    sttHashingFile: "Empreinte du fichier...",
-    sttDownloadingModel: "Téléchargement du modèle : {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Téléchargement du modèle : {loaded} MB",
-    sttVerifyingModel: "Vérification du modèle...",
-    sttModelMismatch: "Le modèle téléchargé ne correspond pas à la somme attendue.",
-    sttModelUnavailable: "Le téléchargement du modèle est indisponible. Vérifiez l’hôte statique.",
-    sttPlanningChunks: "Préparation des segments...",
-    sttTranscribing: "Transcription {current} / {total} segments ({percent}%)",
-    sttNoSpeech: "Aucune voix à transcrire.",
-    sttFailed: "La transcription a échoué. Essayez un fichier plus court.",
-    subtitlePlaceholder: "Les sous-titres apparaîtront pendant la lecture.",
-  },
-  de: {
-    transcriptionSettings: "Transkription",
-    enableTranscription: "Transkription aktivieren",
-    transcriptionLanguage: "Transkriptionssprache",
-    transcriptionAuto: "Auto",
-    transcriptionEnglish: "Englisch",
-    transcriptionChinese: "Chinesisch",
-    transcriptionJapanese: "Japanisch",
-    transcriptionKorean: "Koreanisch",
-    transcriptionSpanish: "Spanisch",
-    transcriptionFrench: "Französisch",
-    transcriptionGerman: "Deutsch",
-    transcriptionPortuguese: "Portugiesisch",
-    transcriptionRussian: "Russisch",
-    transcriptionHindi: "Hindi",
-    sttCapability: "Unterstützung",
-    sttModel: "Modell",
-    sttWebGpuSupported: "WebGPU unterstützt",
-    sttWebGpuUnsupported: "WebGPU nicht unterstützt",
-    sttModelDownloaded: "Modell heruntergeladen",
-    sttModelNotDownloaded: "Modell nicht heruntergeladen",
-    sttUnsupportedMessage: "Transkription wird auf diesem Gerät oder Browser nicht unterstützt.",
-    transcribe: "Transkribieren",
-    transcript: "Transkript",
-    subtitles: "Untertitel",
-    closeTranscript: "Transkript schließen",
-    closeSubtitles: "Untertitel schließen",
-    transcriptEmpty: "Noch kein Transkript.",
-    transcriptReady: "Transkript bereit",
-    transcriptCached: "Transkript aus lokalem Cache geladen",
-    downloadModel: "Modell herunterladen",
-    downloadModelFirst: "Laden Sie das Modell herunter, bevor Sie die Transkription aktivieren.",
-    sttPreparing: "Transkription wird vorbereitet...",
-    sttHashingFile: "Datei wird gehasht...",
-    sttDownloadingModel: "Modell wird heruntergeladen: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Modell wird heruntergeladen: {loaded} MB",
-    sttVerifyingModel: "Modell wird geprüft...",
-    sttModelMismatch: "Das heruntergeladene Modell passt nicht zur erwarteten Prüfsumme.",
-    sttModelUnavailable: "Modelldownload ist nicht verfügbar. Prüfen Sie den statischen Host.",
-    sttPlanningChunks: "Transkriptsegmente werden geplant...",
-    sttTranscribing: "Transkribiere {current} / {total} Segmente ({percent}%)",
-    sttNoSpeech: "Keine Sprache zum Transkribieren gefunden.",
-    sttFailed: "Transkription fehlgeschlagen. Versuchen Sie eine kürzere Datei.",
-    subtitlePlaceholder: "Untertitel erscheinen während der Wiedergabe.",
-  },
-  "pt-BR": {
-    transcriptionSettings: "Transcrição",
-    enableTranscription: "Ativar transcrição",
-    transcriptionLanguage: "Idioma da transcrição",
-    transcriptionAuto: "Auto",
-    transcriptionEnglish: "Inglês",
-    transcriptionChinese: "Chinês",
-    transcriptionJapanese: "Japonês",
-    transcriptionKorean: "Coreano",
-    transcriptionSpanish: "Espanhol",
-    transcriptionFrench: "Francês",
-    transcriptionGerman: "Alemão",
-    transcriptionPortuguese: "Português",
-    transcriptionRussian: "Russo",
-    transcriptionHindi: "Hindi",
-    sttCapability: "Capacidade",
-    sttModel: "Modelo",
-    sttWebGpuSupported: "WebGPU compatível",
-    sttWebGpuUnsupported: "WebGPU não compatível",
-    sttModelDownloaded: "Modelo baixado",
-    sttModelNotDownloaded: "Modelo não baixado",
-    sttUnsupportedMessage: "A transcrição não é compatível com este dispositivo ou navegador.",
-    transcribe: "Transcrever",
-    transcript: "Transcrição",
-    subtitles: "Legendas",
-    closeTranscript: "Fechar transcrição",
-    closeSubtitles: "Fechar legendas",
-    transcriptEmpty: "Ainda não há transcrição.",
-    transcriptReady: "Transcrição pronta",
-    transcriptCached: "Transcrição restaurada do cache local",
-    downloadModel: "Baixar modelo",
-    downloadModelFirst: "Baixe o modelo antes de ativar a transcrição.",
-    sttPreparing: "Preparando transcrição...",
-    sttHashingFile: "Calculando hash do arquivo...",
-    sttDownloadingModel: "Baixando modelo: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Baixando modelo: {loaded} MB",
-    sttVerifyingModel: "Verificando modelo...",
-    sttModelMismatch: "O modelo baixado não corresponde ao checksum esperado.",
-    sttModelUnavailable: "O download do modelo não está disponível. Verifique o host estático.",
-    sttPlanningChunks: "Planejando trechos da transcrição...",
-    sttTranscribing: "Transcrevendo {current} / {total} trechos ({percent}%)",
-    sttNoSpeech: "Nenhuma fala encontrada para transcrever.",
-    sttFailed: "A transcrição falhou. Tente um arquivo mais curto.",
-    subtitlePlaceholder: "As legendas aparecerão durante a reprodução.",
-  },
-  ru: {
-    transcriptionSettings: "Транскрипция",
-    enableTranscription: "Включить транскрипцию",
-    transcriptionLanguage: "Язык транскрипции",
-    transcriptionAuto: "Авто",
-    transcriptionEnglish: "Английский",
-    transcriptionChinese: "Китайский",
-    transcriptionJapanese: "Японский",
-    transcriptionKorean: "Корейский",
-    transcriptionSpanish: "Испанский",
-    transcriptionFrench: "Французский",
-    transcriptionGerman: "Немецкий",
-    transcriptionPortuguese: "Португальский",
-    transcriptionRussian: "Русский",
-    transcriptionHindi: "Хинди",
-    sttCapability: "Поддержка",
-    sttModel: "Модель",
-    sttWebGpuSupported: "WebGPU поддерживается",
-    sttWebGpuUnsupported: "WebGPU не поддерживается",
-    sttModelDownloaded: "Модель загружена",
-    sttModelNotDownloaded: "Модель не загружена",
-    sttUnsupportedMessage: "Транскрипция не поддерживается на этом устройстве или в этом браузере.",
-    transcribe: "Транскрибировать",
-    transcript: "Транскрипт",
-    subtitles: "Субтитры",
-    closeTranscript: "Закрыть транскрипт",
-    closeSubtitles: "Закрыть субтитры",
-    transcriptEmpty: "Транскрипта пока нет.",
-    transcriptReady: "Транскрипт готов",
-    transcriptCached: "Транскрипт восстановлен из локального кэша",
-    downloadModel: "Загрузить модель",
-    downloadModelFirst: "Загрузите модель перед включением транскрипции.",
-    sttPreparing: "Подготовка транскрипции...",
-    sttHashingFile: "Хеширование файла...",
-    sttDownloadingModel: "Загрузка модели: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "Загрузка модели: {loaded} MB",
-    sttVerifyingModel: "Проверка модели...",
-    sttModelMismatch: "Загруженная модель не совпадает с ожидаемой контрольной суммой.",
-    sttModelUnavailable: "Загрузка модели недоступна. Проверьте статический хост.",
-    sttPlanningChunks: "Подготовка фрагментов...",
-    sttTranscribing: "Транскрипция {current} / {total} фрагментов ({percent}%)",
-    sttNoSpeech: "Речь для транскрипции не найдена.",
-    sttFailed: "Транскрипция не удалась. Попробуйте более короткий файл.",
-    subtitlePlaceholder: "Субтитры появятся во время воспроизведения.",
-  },
-  hi: {
-    transcriptionSettings: "ट्रांसक्रिप्शन",
-    enableTranscription: "ट्रांसक्रिप्शन चालू करें",
-    transcriptionLanguage: "ट्रांसक्रिप्शन भाषा",
-    transcriptionAuto: "ऑटो",
-    transcriptionEnglish: "अंग्रेज़ी",
-    transcriptionChinese: "चीनी",
-    transcriptionJapanese: "जापानी",
-    transcriptionKorean: "कोरियाई",
-    transcriptionSpanish: "स्पेनिश",
-    transcriptionFrench: "फ़्रेंच",
-    transcriptionGerman: "जर्मन",
-    transcriptionPortuguese: "पुर्तगाली",
-    transcriptionRussian: "रूसी",
-    transcriptionHindi: "हिन्दी",
-    sttCapability: "क्षमता",
-    sttModel: "मॉडल",
-    sttWebGpuSupported: "WebGPU समर्थित",
-    sttWebGpuUnsupported: "WebGPU समर्थित नहीं",
-    sttModelDownloaded: "मॉडल डाउनलोड हो गया",
-    sttModelNotDownloaded: "मॉडल डाउनलोड नहीं हुआ",
-    sttUnsupportedMessage: "इस डिवाइस या ब्राउज़र पर ट्रांसक्रिप्शन समर्थित नहीं है।",
-    transcribe: "ट्रांसक्राइब",
-    transcript: "ट्रांसक्रिप्ट",
-    subtitles: "सबटाइटल",
-    closeTranscript: "ट्रांसक्रिप्ट बंद करें",
-    closeSubtitles: "सबटाइटल बंद करें",
-    transcriptEmpty: "अभी कोई ट्रांसक्रिप्ट नहीं है।",
-    transcriptReady: "ट्रांसक्रिप्ट तैयार है",
-    transcriptCached: "ट्रांसक्रिप्ट स्थानीय कैश से बहाल हुआ",
-    downloadModel: "मॉडल डाउनलोड करें",
-    downloadModelFirst: "ट्रांसक्रिप्शन चालू करने से पहले मॉडल डाउनलोड करें।",
-    sttPreparing: "ट्रांसक्रिप्शन तैयार हो रहा है...",
-    sttHashingFile: "फ़ाइल हैश हो रही है...",
-    sttDownloadingModel: "मॉडल डाउनलोड हो रहा है: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "मॉडल डाउनलोड हो रहा है: {loaded} MB",
-    sttVerifyingModel: "मॉडल सत्यापित हो रहा है...",
-    sttModelMismatch: "डाउनलोड किया गया मॉडल अपेक्षित checksum से मेल नहीं खाता।",
-    sttModelUnavailable: "मॉडल डाउनलोड उपलब्ध नहीं है। स्थिर होस्ट जांचें।",
-    sttPlanningChunks: "ट्रांसक्रिप्ट हिस्से तैयार हो रहे हैं...",
-    sttTranscribing: "{current} / {total} हिस्से ट्रांसक्राइब हो रहे हैं ({percent}%)",
-    sttNoSpeech: "ट्रांसक्राइब करने के लिए आवाज़ नहीं मिली।",
-    sttFailed: "ट्रांसक्रिप्शन विफल हुआ। छोटा फ़ाइल आज़माएँ।",
-    subtitlePlaceholder: "प्लेबैक के दौरान सबटाइटल दिखाई देंगे।",
-  },
-  ja: {
-    transcriptionSettings: "文字起こし",
-    enableTranscription: "文字起こしを有効にする",
-    transcriptionLanguage: "文字起こし言語",
-    transcriptionAuto: "自動",
-    transcriptionEnglish: "英語",
-    transcriptionChinese: "中国語",
-    transcriptionJapanese: "日本語",
-    transcriptionKorean: "韓国語",
-    transcriptionSpanish: "スペイン語",
-    transcriptionFrench: "フランス語",
-    transcriptionGerman: "ドイツ語",
-    transcriptionPortuguese: "ポルトガル語",
-    transcriptionRussian: "ロシア語",
-    transcriptionHindi: "ヒンディー語",
-    sttCapability: "対応状況",
-    sttModel: "モデル",
-    sttWebGpuSupported: "WebGPU 対応",
-    sttWebGpuUnsupported: "WebGPU 非対応",
-    sttModelDownloaded: "モデルはダウンロード済み",
-    sttModelNotDownloaded: "モデル未ダウンロード",
-    sttUnsupportedMessage: "このデバイスまたはブラウザでは文字起こしを利用できません。",
-    transcribe: "文字起こし",
-    transcript: "文字起こし",
-    subtitles: "字幕",
-    closeTranscript: "文字起こしを閉じる",
-    closeSubtitles: "字幕を閉じる",
-    transcriptEmpty: "文字起こしはまだありません。",
-    transcriptReady: "文字起こし準備完了",
-    transcriptCached: "ローカルキャッシュから文字起こしを復元しました",
-    downloadModel: "モデルをダウンロード",
-    downloadModelFirst: "文字起こしを有効にする前にモデルをダウンロードしてください。",
-    sttPreparing: "文字起こしを準備中...",
-    sttHashingFile: "ファイルをハッシュ中...",
-    sttDownloadingModel: "モデルをダウンロード中: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "モデルをダウンロード中: {loaded} MB",
-    sttVerifyingModel: "モデルを検証中...",
-    sttModelMismatch: "ダウンロードしたモデルが想定チェックサムと一致しません。",
-    sttModelUnavailable: "モデルをダウンロードできません。静的ホストを確認してください。",
-    sttPlanningChunks: "文字起こしチャンクを準備中...",
-    sttTranscribing: "{current} / {total} チャンクを文字起こし中 ({percent}%)",
-    sttNoSpeech: "文字起こしする音声が見つかりません。",
-    sttFailed: "文字起こしに失敗しました。短いファイルで試してください。",
-    subtitlePlaceholder: "再生中に字幕が表示されます。",
-  },
-  ko: {
-    transcriptionSettings: "전사",
-    enableTranscription: "전사 사용",
-    transcriptionLanguage: "전사 언어",
-    transcriptionAuto: "자동",
-    transcriptionEnglish: "영어",
-    transcriptionChinese: "중국어",
-    transcriptionJapanese: "일본어",
-    transcriptionKorean: "한국어",
-    transcriptionSpanish: "스페인어",
-    transcriptionFrench: "프랑스어",
-    transcriptionGerman: "독일어",
-    transcriptionPortuguese: "포르투갈어",
-    transcriptionRussian: "러시아어",
-    transcriptionHindi: "힌디어",
-    sttCapability: "지원 상태",
-    sttModel: "모델",
-    sttWebGpuSupported: "WebGPU 지원됨",
-    sttWebGpuUnsupported: "WebGPU 지원 안 됨",
-    sttModelDownloaded: "모델 다운로드됨",
-    sttModelNotDownloaded: "모델 다운로드 안 됨",
-    sttUnsupportedMessage: "이 기기 또는 브라우저에서는 전사를 지원하지 않습니다.",
-    transcribe: "전사",
-    transcript: "전사문",
-    subtitles: "자막",
-    closeTranscript: "전사문 닫기",
-    closeSubtitles: "자막 닫기",
-    transcriptEmpty: "아직 전사문이 없습니다.",
-    transcriptReady: "전사문 준비됨",
-    transcriptCached: "로컬 캐시에서 전사문을 복원했습니다",
-    downloadModel: "모델 다운로드",
-    downloadModelFirst: "전사를 켜기 전에 모델을 다운로드하세요.",
-    sttPreparing: "전사 준비 중...",
-    sttHashingFile: "파일 해시 계산 중...",
-    sttDownloadingModel: "모델 다운로드 중: {loaded} MB / {total} MB",
-    sttDownloadUnknown: "모델 다운로드 중: {loaded} MB",
-    sttVerifyingModel: "모델 확인 중...",
-    sttModelMismatch: "다운로드한 모델이 예상 체크섬과 일치하지 않습니다.",
-    sttModelUnavailable: "모델 다운로드를 사용할 수 없습니다. 정적 호스트를 확인하세요.",
-    sttPlanningChunks: "전사 청크 준비 중...",
-    sttTranscribing: "{current} / {total} 청크 전사 중 ({percent}%)",
-    sttNoSpeech: "전사할 음성을 찾지 못했습니다.",
-    sttFailed: "전사에 실패했습니다. 더 짧은 파일로 시도하세요.",
-    subtitlePlaceholder: "재생 중 자막이 표시됩니다.",
-  },
-  "zh-CN": {
-    transcriptionSettings: "转录",
-    enableTranscription: "启用转录",
-    transcriptionLanguage: "转录语言",
-    transcriptionAuto: "自动",
-    transcriptionEnglish: "英语",
-    transcriptionChinese: "中文",
-    transcriptionJapanese: "日语",
-    transcriptionKorean: "韩语",
-    transcriptionSpanish: "西班牙语",
-    transcriptionFrench: "法语",
-    transcriptionGerman: "德语",
-    transcriptionPortuguese: "葡萄牙语",
-    transcriptionRussian: "俄语",
-    transcriptionHindi: "印地语",
-    sttCapability: "支持状态",
-    sttModel: "模型",
-    sttWebGpuSupported: "支持 WebGPU",
-    sttWebGpuUnsupported: "不支持 WebGPU",
-    sttModelDownloaded: "模型已下载",
-    sttModelNotDownloaded: "模型未下载",
-    sttUnsupportedMessage: "此设备或浏览器不支持转录。",
-    transcribe: "转录",
-    transcript: "转录文本",
-    subtitles: "字幕",
-    closeTranscript: "关闭转录文本",
-    closeSubtitles: "关闭字幕",
-    transcriptEmpty: "还没有转录文本。",
-    transcriptReady: "转录文本已就绪",
-    transcriptCached: "已从本地缓存恢复转录文本",
-    downloadModel: "下载模型",
-    downloadModelFirst: "请先下载模型再启用转录。",
-    sttPreparing: "正在准备转录...",
-    sttHashingFile: "正在计算文件哈希...",
-    sttDownloadingModel: "正在下载模型：{loaded} MB / {total} MB",
-    sttDownloadUnknown: "正在下载模型：{loaded} MB",
-    sttVerifyingModel: "正在验证模型...",
-    sttModelMismatch: "下载的模型与预期校验和不匹配。",
-    sttModelUnavailable: "模型下载不可用。请检查静态主机。",
-    sttPlanningChunks: "正在规划转录片段...",
-    sttTranscribing: "正在转录 {current} / {total} 个片段（{percent}%）",
-    sttNoSpeech: "没有找到可转录的语音。",
-    sttFailed: "转录失败。请尝试更短的文件。",
-    subtitlePlaceholder: "播放时会显示字幕。",
-  },
-  "zh-TW": {
-    transcriptionSettings: "轉錄",
-    enableTranscription: "啟用轉錄",
-    transcriptionLanguage: "轉錄語言",
-    transcriptionAuto: "自動",
-    transcriptionEnglish: "英文",
-    transcriptionChinese: "中文",
-    transcriptionJapanese: "日文",
-    transcriptionKorean: "韓文",
-    transcriptionSpanish: "西班牙文",
-    transcriptionFrench: "法文",
-    transcriptionGerman: "德文",
-    transcriptionPortuguese: "葡萄牙文",
-    transcriptionRussian: "俄文",
-    transcriptionHindi: "印地文",
-    sttCapability: "支援狀態",
-    sttModel: "模型",
-    sttWebGpuSupported: "支援 WebGPU",
-    sttWebGpuUnsupported: "不支援 WebGPU",
-    sttModelDownloaded: "模型已下載",
-    sttModelNotDownloaded: "模型未下載",
-    sttUnsupportedMessage: "此裝置或瀏覽器不支援轉錄。",
-    transcribe: "轉錄",
-    transcript: "轉錄文字",
-    subtitles: "字幕",
-    closeTranscript: "關閉轉錄文字",
-    closeSubtitles: "關閉字幕",
-    transcriptEmpty: "尚無轉錄文字。",
-    transcriptReady: "轉錄文字已就緒",
-    transcriptCached: "已從本機快取還原轉錄文字",
-    downloadModel: "下載模型",
-    downloadModelFirst: "請先下載模型再啟用轉錄。",
-    sttPreparing: "正在準備轉錄...",
-    sttHashingFile: "正在計算檔案雜湊...",
-    sttDownloadingModel: "正在下載模型：{loaded} MB / {total} MB",
-    sttDownloadUnknown: "正在下載模型：{loaded} MB",
-    sttVerifyingModel: "正在驗證模型...",
-    sttModelMismatch: "下載的模型與預期校驗和不符。",
-    sttModelUnavailable: "模型下載無法使用。請檢查靜態主機。",
-    sttPlanningChunks: "正在規劃轉錄片段...",
-    sttTranscribing: "正在轉錄 {current} / {total} 個片段（{percent}%）",
-    sttNoSpeech: "找不到可轉錄的語音。",
-    sttFailed: "轉錄失敗。請嘗試較短的檔案。",
-    subtitlePlaceholder: "播放時會顯示字幕。",
-  },
-};
-
 const STORAGE_KEY = "audioNavigatorSettings";
 const DEFAULT_SETTINGS = {
   theme: "auto",
   silenceThreshold: 0.01,
   minSilenceSeconds: 12,
   minAudibleSeconds: 0.2,
-  transcriptionEnabled: false,
-  transcriptionLanguage: "auto",
 };
 const languagePreference = getLanguagePreference();
 const savedSettings = getSavedSettings(languagePreference.language);
@@ -1284,13 +760,8 @@ const state = {
     silenceThreshold: savedSettings.silenceThreshold,
     minSilenceSeconds: savedSettings.minSilenceSeconds,
     minAudibleSeconds: savedSettings.minAudibleSeconds,
-    transcriptionEnabled: savedSettings.transcriptionEnabled,
-    transcriptionLanguage: savedSettings.transcriptionLanguage,
   },
   audioBuffer: null,
-  currentFile: null,
-  currentFileHash: "",
-  currentFileSize: 0,
   mediaDuration: 0,
   monoSamples: null,
   peaks: [],
@@ -1323,60 +794,11 @@ const state = {
   lastCurrentTimeText: "",
   lastDurationText: "",
   lastTimelineValue: "",
-  sttCapability: {
-    checked: false,
-    isSupported: false,
-    reason: "",
-  },
-  sttModelInfo: {
-    checked: false,
-    isDownloaded: false,
-  },
-  sttWorker: null,
-  sttWorkerRequests: new Map(),
-  sttNextRequestId: 1,
-  sttIsRunning: false,
-  sttStatusKey: "",
-  sttStatusParams: {},
-  transcript: null,
-  activeTranscriptIndex: -1,
-  isSubtitleVisible: false,
-  subtitleDrag: null,
 };
 
 const RMS_WINDOW_SECONDS = 0.05;
 const SEEK_EPSILON = 0.08;
 const ANALYSIS_CHUNK_DURATION_MS = 16;
-const STT_SAMPLE_RATE = 16000;
-const STT_CHUNK_TARGET_SECONDS = 60;
-const STT_CHUNK_MIN_SECONDS = 25;
-const STT_CHUNK_MAX_SECONDS = 75;
-const STT_CHUNK_OVERLAP_SECONDS = 0.35;
-const STT_CHUNK_SPLIT_SEARCH_SECONDS = 7;
-const STT_CHUNK_ALGORITHM_VERSION = "rms-v1";
-const STT_DB_NAME = "audioNavigatorStt";
-const STT_DB_VERSION = 1;
-const STT_MODEL = {
-  id: "whisper-tiny-multilingual",
-  version: "ggml-tiny-main-20250902",
-  url: "https://proj-assets.mkyu.one/markyuone/audionavi/models/whisper/ggml-tiny.bin",
-  expectedBytes: 77691713,
-  sha256: "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
-};
-const STT_LANGUAGES = new Set(["auto", "en", "zh", "ja", "ko", "es", "fr", "de", "pt", "ru", "hi"]);
-const STT_LANGUAGE_BY_APP_LANGUAGE = {
-  en: "en",
-  es: "es",
-  fr: "fr",
-  de: "de",
-  "pt-BR": "pt",
-  ru: "ru",
-  hi: "hi",
-  ja: "ja",
-  ko: "ko",
-  "zh-CN": "zh",
-  "zh-TW": "zh",
-};
 const SUPPORTED_AUDIO_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "oga", "ogg", "opus", "wav", "weba"]);
 const SUPPORTED_VIDEO_EXTENSIONS = new Set(["avi", "m4v", "mkv", "mov", "mp4", "webm"]);
 const RECORDED_AUDIO_MIME_TYPES = [
@@ -1421,72 +843,12 @@ themeOptions.forEach((option) => {
   input.addEventListener("input", updateDetectionSetting);
 });
 
-transcriptionEnabledInput.addEventListener("change", () => {
-  if (transcriptionEnabledInput.checked && !state.sttModelInfo.isDownloaded) {
-    transcriptionEnabledInput.checked = false;
-    state.settings.transcriptionEnabled = false;
-    setTranscriptStatus("downloadModelFirst", {}, true);
-    persistSettings();
-    syncTranscriptionUi();
-    return;
-  }
-
-  state.settings.transcriptionEnabled = transcriptionEnabledInput.checked;
-  persistSettings();
-  if (state.settings.transcriptionEnabled) {
-    checkStoredModel().catch(() => {});
-  }
-  syncTranscriptionUi();
-});
-
-downloadModelButton.addEventListener("click", () => {
-  downloadAndStoreSttModel().catch((error) => {
-    console.error(error);
-    setTranscriptStatus("sttModelUnavailable", {}, true);
-    syncTranscriptionUi();
-  });
-});
-
-transcriptionLanguageControl.addEventListener("click", (event) => {
-  if (event.target.closest(".custom-menu")) {
-    return;
-  }
-  setLanguageMenuOpen(false);
-  setTranscriptionLanguageMenuOpen(transcriptionLanguageMenu.classList.contains("is-hidden"));
-});
-
-transcriptionLanguageSelect.addEventListener("click", (event) => {
-  event.stopPropagation();
-  setTranscriptionLanguageMenuOpen(transcriptionLanguageMenu.classList.contains("is-hidden"));
-});
-
-transcriptionLanguageSelect.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    setTranscriptionLanguageMenuOpen(true);
-    getSelectedTranscriptionLanguageOption()?.focus();
-  }
-});
-
-transcriptionLanguageOptions.forEach((option) => {
-  option.addEventListener("click", () => {
-    setTranscriptionLanguage(option.dataset.value);
-    setTranscriptionLanguageMenuOpen(false);
-    transcriptionLanguageSelect.focus();
-  });
-
-  option.addEventListener("keydown", (event) => {
-    handleTranscriptionLanguageOptionKeydown(event, option);
-  });
-});
-
 resetSettings.addEventListener("click", resetDefaultSettings);
 
 languageControl.addEventListener("click", (event) => {
   if (event.target.closest(".custom-menu")) {
     return;
   }
-  setTranscriptionLanguageMenuOpen(false);
   setLanguageMenuOpen(languageMenu.classList.contains("is-hidden"));
 });
 
@@ -1588,17 +950,10 @@ document.addEventListener("click", (event) => {
   if (!event.target.closest(".language-control")) {
     setLanguageMenuOpen(false);
   }
-  if (!event.target.closest(".transcription-language-control")) {
-    setTranscriptionLanguageMenuOpen(false);
-  }
 });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
-    if (isTranscriptOpen()) {
-      closeTranscript();
-      return;
-    }
     if (isLicensesOpen()) {
       closeLicenses();
       return;
@@ -1609,13 +964,10 @@ document.addEventListener("keydown", (event) => {
     }
     setJumpMenuOpen(false);
     setLanguageMenuOpen(false);
-    setTranscriptionLanguageMenuOpen(false);
     if (document.activeElement?.closest(".jump-amount-wrap")) {
       jumpAmount.focus();
     } else if (document.activeElement?.closest(".language-control")) {
       languageSelect.focus();
-    } else if (document.activeElement?.closest(".transcription-language-control")) {
-      transcriptionLanguageSelect.focus();
     }
   }
 });
@@ -1630,22 +982,6 @@ speedSlider.addEventListener("input", updatePlaybackSpeed);
 
 volumeSlider.addEventListener("input", updateOutputGain);
 nextAudio.addEventListener("click", seekToNextAudio);
-transcribeButton.addEventListener("click", () => {
-  startTranscription().catch((error) => {
-    console.error(error);
-    setTranscriptStatus("sttFailed", {}, true);
-  });
-});
-transcriptButton.addEventListener("click", openTranscript);
-subtitleButton.addEventListener("click", toggleSubtitles);
-transcriptClose.addEventListener("click", closeTranscript);
-transcriptBackdrop.addEventListener("click", (event) => {
-  if (event.target === transcriptBackdrop) {
-    closeTranscript();
-  }
-});
-subtitleClose.addEventListener("click", hideSubtitles);
-subtitleDragHandle.addEventListener("pointerdown", startSubtitleDrag);
 
 function seekToNextAudio() {
   const current = getCurrentTime();
@@ -1688,8 +1024,6 @@ canvas.addEventListener("pointerup", () => {
   state.isPointerSeeking = false;
 });
 
-window.addEventListener("pointermove", moveSubtitleDrag);
-window.addEventListener("pointerup", stopSubtitleDrag);
 waveformWrap.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 });
@@ -1701,8 +1035,6 @@ syncSettingsControls();
 syncAppVersion();
 setLanguage(state.language, false);
 applyLanguage();
-checkSttCapability();
-syncTranscriptionUi();
 
 async function loadFile(file) {
   setStatus("readingAudio");
@@ -1722,18 +1054,12 @@ async function loadFile(file) {
     const arrayBuffer = await readFileAsArrayBuffer(file, (percent) => {
       setBusy(true, "processingAudio", "readingFileProgress", { percent: Math.round(percent) }, percent);
     });
-    const fileHashPromise = sha256ArrayBuffer(arrayBuffer);
     setBusy(true, "processingAudio", "decodingAudio", {}, null);
     await nextPaint();
     const decodedBuffer = await decodeMediaFile(file, arrayBuffer, mediaKind);
-    const fileHash = await fileHashPromise;
 
     stopPlayback();
-    resetTranscriptState();
     clearAnalysisCaches();
-    state.currentFile = file;
-    state.currentFileHash = fileHash;
-    state.currentFileSize = file.size;
     state.audioBuffer = decodedBuffer;
     state.mediaDuration = decodedBuffer.duration;
     state.playbackOffset = 0;
@@ -1759,7 +1085,6 @@ async function loadFile(file) {
     });
     updateAutoThreshold();
     analyzeRegions();
-    await restoreCachedTranscript();
     resizeCanvas();
     updateTimeUi();
     setAnalysisStatus();
@@ -2388,8 +1713,6 @@ function updateTimeUi() {
     updateRangeFill(timeline);
     state.lastTimelineValue = timelineValue;
   }
-
-  updateActiveTranscript(current);
 }
 
 function getAnalysisDuration() {
@@ -2605,32 +1928,11 @@ function setLanguage(language, shouldApply = true) {
   }
 }
 
-function setTranscriptionLanguage(language, shouldPersist = true) {
-  const fallbackLanguage = STT_LANGUAGES.has(language) ? language : DEFAULT_SETTINGS.transcriptionLanguage;
-  const selectedOption = transcriptionLanguageOptions.find((option) => option.dataset.value === fallbackLanguage);
-  state.settings.transcriptionLanguage = fallbackLanguage;
-  transcriptionLanguageSelect.value = fallbackLanguage;
-  transcriptionLanguageValue.textContent = selectedOption?.textContent || translate("transcriptionAuto");
-  transcriptionLanguageOptions.forEach((option) => {
-    option.setAttribute("aria-selected", String(option.dataset.value === fallbackLanguage));
-  });
-
-  if (shouldPersist) {
-    persistSettings();
-    resetTranscriptState();
-    if (state.audioBuffer) {
-      restoreCachedTranscript().catch(() => {});
-    }
-  }
-}
-
 function openSettings() {
   settingsBackdrop.classList.remove("is-hidden");
   settingsBackdrop.setAttribute("aria-hidden", "false");
   setLanguageMenuOpen(false);
-  setTranscriptionLanguageMenuOpen(false);
   setJumpMenuOpen(false);
-  syncTranscriptionUi();
   settingsClose.focus();
 }
 
@@ -2639,7 +1941,6 @@ function closeSettings() {
   settingsBackdrop.classList.add("is-hidden");
   settingsBackdrop.setAttribute("aria-hidden", "true");
   setLanguageMenuOpen(false);
-  setTranscriptionLanguageMenuOpen(false);
   settingsButton.focus();
 }
 
@@ -2651,7 +1952,6 @@ function openLicenses() {
   licenseBackdrop.classList.remove("is-hidden");
   licenseBackdrop.setAttribute("aria-hidden", "false");
   setLanguageMenuOpen(false);
-  setTranscriptionLanguageMenuOpen(false);
   setJumpMenuOpen(false);
   licenseClose.focus();
 }
@@ -2694,10 +1994,7 @@ function syncSettingsControls() {
   silenceThresholdInput.value = String(state.settings.silenceThreshold);
   minSilenceInput.value = String(state.settings.minSilenceSeconds);
   minAudibleInput.value = String(state.settings.minAudibleSeconds);
-  transcriptionEnabledInput.checked = Boolean(state.settings.transcriptionEnabled);
-  setTranscriptionLanguage(state.settings.transcriptionLanguage, false);
   updateSettingsOutputs();
-  syncTranscriptionUi();
 }
 
 function syncAppVersion() {
@@ -2719,10 +2016,6 @@ function updateDetectionSetting() {
   updateSettingsOutputs();
   persistSettings();
   reanalyzeSilenceSettings();
-  resetTranscriptState();
-  if (state.audioBuffer) {
-    restoreCachedTranscript().catch(() => {});
-  }
 }
 
 function updateSettingsOutputs() {
@@ -2737,17 +2030,12 @@ function updateSettingsOutputs() {
 function resetDefaultSettings() {
   const fallbackLanguage = getLanguagePreference().language;
   state.settings = { ...DEFAULT_SETTINGS };
-  state.settings.transcriptionLanguage = STT_LANGUAGE_BY_APP_LANGUAGE[fallbackLanguage] || DEFAULT_SETTINGS.transcriptionLanguage;
   setLanguage(fallbackLanguage, false);
   applyTheme();
   syncSettingsControls();
   applyLanguage();
   persistSettings();
   reanalyzeSilenceSettings();
-  resetTranscriptState();
-  if (state.audioBuffer) {
-    restoreCachedTranscript().catch(() => {});
-  }
 }
 
 function reanalyzeSilenceSettings() {
@@ -2802,24 +2090,8 @@ function setLanguageMenuOpen(isOpen) {
   languageSelect.setAttribute("aria-expanded", String(isOpen));
 }
 
-function setTranscriptionLanguageMenuOpen(isOpen) {
-  if (
-    transcriptionLanguageControl.classList.contains("is-hidden")
-    || transcriptionLanguageSelect.disabled
-  ) {
-    isOpen = false;
-  }
-
-  transcriptionLanguageMenu.classList.toggle("is-hidden", !isOpen);
-  transcriptionLanguageSelect.setAttribute("aria-expanded", String(isOpen));
-}
-
 function getSelectedLanguageOption() {
   return languageOptions.find((option) => option.getAttribute("aria-selected") === "true");
-}
-
-function getSelectedTranscriptionLanguageOption() {
-  return transcriptionLanguageOptions.find((option) => option.getAttribute("aria-selected") === "true");
 }
 
 function handleLanguageOptionKeydown(event, option) {
@@ -2836,733 +2108,6 @@ function handleLanguageOptionKeydown(event, option) {
     const nextIndex = (currentIndex + direction + languageOptions.length) % languageOptions.length;
     languageOptions[nextIndex].focus();
   }
-}
-
-function handleTranscriptionLanguageOptionKeydown(event, option) {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    option.click();
-    return;
-  }
-
-  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-    event.preventDefault();
-    const direction = event.key === "ArrowDown" ? 1 : -1;
-    const currentIndex = transcriptionLanguageOptions.indexOf(option);
-    const nextIndex = (currentIndex + direction + transcriptionLanguageOptions.length) % transcriptionLanguageOptions.length;
-    transcriptionLanguageOptions[nextIndex].focus();
-  }
-}
-
-function checkSttCapability() {
-  const isChromeLike = /Chrome|Chromium|Edg\//.test(navigator.userAgent);
-  const hasWebGpu = Boolean(navigator.gpu);
-  const hasWorker = typeof Worker !== "undefined";
-  const hasIndexedDb = typeof indexedDB !== "undefined";
-  const hasSharedArrayBuffer = typeof SharedArrayBuffer !== "undefined";
-  state.sttCapability = {
-    checked: true,
-    isSupported: isChromeLike && hasWebGpu && hasWorker && hasIndexedDb && hasSharedArrayBuffer,
-    reason: hasWebGpu ? "" : "webgpu",
-  };
-  checkStoredModel().catch(() => {
-    state.sttModelInfo = { checked: true, isDownloaded: false };
-    syncTranscriptionUi();
-  });
-}
-
-async function checkStoredModel() {
-  const stored = await idbGet("models", STT_MODEL.id);
-  state.sttModelInfo = {
-    checked: true,
-    isDownloaded: Boolean(stored?.bytes?.byteLength === STT_MODEL.expectedBytes && stored?.sha256 === STT_MODEL.sha256),
-  };
-  if (!state.sttModelInfo.isDownloaded && state.settings.transcriptionEnabled) {
-    state.settings.transcriptionEnabled = false;
-    persistSettings();
-  }
-  syncTranscriptionUi();
-}
-
-function syncTranscriptionUi() {
-  const isSupported = state.sttCapability.isSupported;
-  const hasModel = state.sttModelInfo.isDownloaded;
-  if (!hasModel && state.settings.transcriptionEnabled) {
-    state.settings.transcriptionEnabled = false;
-  }
-
-  transcriptionSettingsSection.classList.toggle("is-stt-pending", !state.sttCapability.checked);
-  transcriptionSettingsSection.classList.toggle("is-stt-unsupported", state.sttCapability.checked && !isSupported);
-  transcriptionSettingsSection.classList.toggle("is-stt-missing-model", isSupported && !hasModel);
-  transcriptionSettingsSection.classList.toggle("is-stt-ready", isSupported && hasModel);
-
-  transcriptionEnabledInput.checked = Boolean(state.settings.transcriptionEnabled && hasModel);
-  transcriptionEnabledInput.disabled = !isSupported || !hasModel || state.sttIsRunning;
-  transcriptionLanguageSelect.value = state.settings.transcriptionLanguage;
-  transcriptionLanguageSelect.disabled = !isSupported || !hasModel || state.sttIsRunning;
-  setTranscriptionLanguage(state.settings.transcriptionLanguage, false);
-
-  const enabledAndSupported = state.settings.transcriptionEnabled && isSupported && hasModel;
-  const hasFile = Boolean(state.audioBuffer);
-  const hasTranscript = Boolean(state.transcript?.segments?.length);
-  const configRows = [...transcriptionSettingsSection.querySelectorAll(".transcription-config-row")];
-  configRows.forEach((row, index) => {
-    row.classList.toggle("is-hidden", !isSupported || (index > 0 && !hasModel));
-  });
-  sttStateList.classList.add("is-hidden");
-  sttModelActions.classList.toggle("is-hidden", !isSupported || hasModel);
-  downloadModelButton.disabled = !isSupported || hasModel || state.sttIsRunning;
-  sttUnsupportedMessage.classList.toggle("is-hidden", isSupported);
-  transcribeButton.classList.toggle("is-hidden", !(enabledAndSupported && hasFile && !state.sttIsRunning));
-  transcriptButton.classList.toggle("is-hidden", !(state.settings.transcriptionEnabled && hasTranscript));
-  subtitleButton.classList.toggle("is-hidden", !(state.settings.transcriptionEnabled && hasTranscript));
-  transcriptStatus.classList.toggle(
-    "is-hidden",
-    !(state.settings.transcriptionEnabled && (state.sttStatusKey || hasTranscript || state.sttIsRunning)),
-  );
-
-  sttWebGpuState.textContent = translate(state.sttCapability.isSupported ? "sttWebGpuSupported" : "sttWebGpuUnsupported");
-  sttWebGpuState.classList.toggle("is-good", state.sttCapability.isSupported);
-  sttModelState.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
-  sttModelState.classList.toggle("is-good", state.sttModelInfo.isDownloaded);
-  sttModelStateText.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
-
-  if (state.sttStatusKey) {
-    transcriptStatus.textContent = translate(state.sttStatusKey, state.sttStatusParams);
-    sttSettingsStatus.textContent = translate(state.sttStatusKey, state.sttStatusParams);
-  } else if (hasTranscript) {
-    transcriptStatus.textContent = translate("transcriptReady");
-  }
-  transcriptStatus.classList.toggle("is-error", state.sttStatusKey === "sttFailed" || state.sttStatusKey === "sttModelUnavailable");
-  sttSettingsStatus.classList.toggle("is-hidden", !state.sttStatusKey || !isSupported || hasModel);
-  sttSettingsStatus.classList.toggle("is-error", state.sttStatusKey === "sttFailed" || state.sttStatusKey === "sttModelUnavailable");
-
-  if (!state.settings.transcriptionEnabled) {
-    hideSubtitles();
-  }
-}
-
-async function startTranscription() {
-  if (
-    !state.audioBuffer
-    || state.sttIsRunning
-    || !state.settings.transcriptionEnabled
-    || !state.sttCapability.isSupported
-    || !state.sttModelInfo.isDownloaded
-  ) {
-    return;
-  }
-
-  state.sttIsRunning = true;
-  setTranscriptStatus("sttPreparing");
-  syncTranscriptionUi();
-
-  try {
-    const cached = await loadCachedTranscript();
-    if (cached) {
-      setTranscript(cached, "transcriptCached");
-      return;
-    }
-
-    const modelBytes = await ensureSttModel();
-    setTranscriptStatus("sttPlanningChunks");
-    await nextPaint();
-    const chunks = await buildSttChunks();
-
-    if (!chunks.length) {
-      setTranscriptStatus("sttNoSpeech", {}, true);
-      return;
-    }
-
-    await callSttWorker("init", { modelBuffer: modelBytes.buffer }, [modelBytes.buffer]);
-
-    const allSegments = [];
-    for (let index = 0; index < chunks.length; index += 1) {
-      const chunk = chunks[index];
-      const percent = Math.round((index / chunks.length) * 100);
-      setTranscriptStatus("sttTranscribing", { current: index + 1, total: chunks.length, percent });
-      await nextPaint();
-      const language = state.settings.transcriptionLanguage;
-      const result = await callSttWorker(
-        "transcribe",
-        {
-          pcm: chunk.pcm.buffer,
-          language,
-          chunkStart: chunk.start,
-        },
-        [chunk.pcm.buffer],
-      );
-      allSegments.push(...normalizeTranscriptSegments(result.segments, chunk.start, chunk.end, language));
-    }
-
-    const transcript = {
-      modelId: STT_MODEL.id,
-      modelVersion: STT_MODEL.version,
-      language: state.settings.transcriptionLanguage,
-      chunkingVersion: STT_CHUNK_ALGORITHM_VERSION,
-      createdAt: new Date().toISOString(),
-      segments: mergeTranscriptSegments(allSegments),
-    };
-
-    if (!transcript.segments.length) {
-      setTranscriptStatus("sttNoSpeech", {}, true);
-      return;
-    }
-
-    await saveCachedTranscript(transcript);
-    setTranscript(transcript, "transcriptReady");
-  } catch (error) {
-    console.error(error);
-    const key = /model/i.test(error?.message || "") ? "sttModelUnavailable" : "sttFailed";
-    setTranscriptStatus(key, {}, true);
-  } finally {
-    state.sttIsRunning = false;
-    syncTranscriptionUi();
-  }
-}
-
-async function downloadAndStoreSttModel() {
-  if (!state.sttCapability.isSupported || state.sttIsRunning) {
-    return;
-  }
-
-  state.sttIsRunning = true;
-  setTranscriptStatus("sttPreparing");
-  syncTranscriptionUi();
-  try {
-    await ensureSttModel();
-    state.sttStatusKey = "";
-    state.sttStatusParams = {};
-  } finally {
-    state.sttIsRunning = false;
-    syncTranscriptionUi();
-  }
-}
-
-async function ensureSttModel() {
-  const stored = await idbGet("models", STT_MODEL.id);
-  if (stored?.bytes?.byteLength === STT_MODEL.expectedBytes && stored?.sha256 === STT_MODEL.sha256) {
-    state.sttModelInfo = { checked: true, isDownloaded: true };
-    syncTranscriptionUi();
-    return new Uint8Array(stored.bytes);
-  }
-
-  const bytes = await downloadSttModel();
-  setTranscriptStatus("sttVerifyingModel");
-  await nextPaint();
-  const sha256 = await sha256ArrayBuffer(bytes.buffer);
-  if (bytes.byteLength !== STT_MODEL.expectedBytes || sha256 !== STT_MODEL.sha256) {
-    await idbDelete("models", STT_MODEL.id);
-    throw new Error(translate("sttModelMismatch"));
-  }
-
-  await idbPut("models", {
-    id: STT_MODEL.id,
-    version: STT_MODEL.version,
-    bytes: bytes.buffer,
-    sha256,
-    size: bytes.byteLength,
-    savedAt: new Date().toISOString(),
-  });
-  state.sttModelInfo = { checked: true, isDownloaded: true };
-  syncTranscriptionUi();
-  return bytes;
-}
-
-async function downloadSttModel() {
-  const response = await fetch(STT_MODEL.url, { mode: "cors", cache: "force-cache" });
-  if (!response.ok || !response.body) {
-    throw new Error("Model download unavailable.");
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("text/html")) {
-    throw new Error("Model host returned HTML instead of the model binary.");
-  }
-
-  const declaredSize = Number(response.headers.get("content-length")) || STT_MODEL.expectedBytes;
-  const reader = response.body.getReader();
-  const chunks = [];
-  let loaded = 0;
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(value);
-    loaded += value.byteLength;
-    if (declaredSize) {
-      setTranscriptStatus("sttDownloadingModel", { loaded: formatMegabytes(loaded), total: formatMegabytes(declaredSize) });
-    } else {
-      setTranscriptStatus("sttDownloadUnknown", { loaded: formatMegabytes(loaded) });
-    }
-  }
-
-  const output = new Uint8Array(loaded);
-  let offset = 0;
-  chunks.forEach((chunk) => {
-    output.set(chunk, offset);
-    offset += chunk.byteLength;
-  });
-  return output;
-}
-
-async function buildSttChunks() {
-  const buffer = state.audioBuffer;
-  const samples = collectMonoSamples(buffer);
-  const regions = state.regions.length ? state.regions : [{ start: 0, end: getMediaDuration() }];
-  const chunks = [];
-
-  for (const region of regions) {
-    const planned = splitAudibleRegion(region);
-    for (const chunk of planned) {
-      const pcm = resampleMonoSlice(samples, buffer.sampleRate, chunk.start, chunk.end, STT_SAMPLE_RATE);
-      if (pcm.length > 0) {
-        chunks.push({ ...chunk, pcm });
-      }
-      await nextPaint();
-    }
-  }
-
-  return chunks;
-}
-
-function splitAudibleRegion(region) {
-  const chunks = [];
-  const duration = region.end - region.start;
-  if (duration <= STT_CHUNK_MAX_SECONDS) {
-    return [{ start: region.start, end: region.end }];
-  }
-
-  let cursor = region.start;
-  while (region.end - cursor > STT_CHUNK_MAX_SECONDS) {
-    const desired = Math.min(cursor + STT_CHUNK_TARGET_SECONDS, region.end);
-    const split = findLowRmsSplit(cursor + STT_CHUNK_MIN_SECONDS, desired + STT_CHUNK_SPLIT_SEARCH_SECONDS, desired);
-    const end = clampNumber(split, cursor + STT_CHUNK_MIN_SECONDS, Math.min(cursor + STT_CHUNK_MAX_SECONDS, region.end));
-    chunks.push({ start: cursor, end });
-    cursor = Math.max(end - STT_CHUNK_OVERLAP_SECONDS, cursor + STT_CHUNK_MIN_SECONDS);
-  }
-
-  if (region.end - cursor > 1) {
-    chunks.push({ start: cursor, end: region.end });
-  }
-  return chunks;
-}
-
-function findLowRmsSplit(start, end, fallback) {
-  let bestTime = fallback;
-  let bestRms = Infinity;
-  const windowStart = Math.max(0, start);
-  const windowEnd = Math.min(getMediaDuration(), end);
-
-  state.rmsFrames.forEach((frame) => {
-    if (frame.time < windowStart || frame.time > windowEnd) {
-      return;
-    }
-    const distancePenalty = Math.abs(frame.time - fallback) * 0.0005;
-    const score = frame.rms + distancePenalty;
-    if (score < bestRms) {
-      bestRms = score;
-      bestTime = frame.time;
-    }
-  });
-
-  return bestTime;
-}
-
-function resampleMonoSlice(samples, sourceRate, startSeconds, endSeconds, targetRate) {
-  const sourceStart = Math.max(0, Math.floor(startSeconds * sourceRate));
-  const sourceEnd = Math.min(samples.length, Math.ceil(endSeconds * sourceRate));
-  const sourceLength = Math.max(0, sourceEnd - sourceStart);
-  const targetLength = Math.max(1, Math.round((sourceLength / sourceRate) * targetRate));
-  const output = new Float32Array(targetLength);
-  const ratio = sourceRate / targetRate;
-
-  for (let index = 0; index < targetLength; index += 1) {
-    const sourceIndex = sourceStart + index * ratio;
-    const low = Math.min(sourceEnd - 1, Math.floor(sourceIndex));
-    const high = Math.min(sourceEnd - 1, low + 1);
-    const mix = sourceIndex - low;
-    output[index] = samples[low] * (1 - mix) + samples[high] * mix;
-  }
-
-  return output;
-}
-
-function getSttWorker() {
-  if (state.sttWorker) {
-    return state.sttWorker;
-  }
-
-  state.sttWorker = new Worker("assets/vendor/whisper/stt-worker.js");
-  state.sttWorker.addEventListener("message", (event) => {
-    const { id, type, message } = event.data || {};
-    const pending = state.sttWorkerRequests.get(id);
-    if (!pending) {
-      return;
-    }
-    state.sttWorkerRequests.delete(id);
-    if (type === "error") {
-      pending.reject(new Error(message || "Transcription worker failed."));
-    } else {
-      pending.resolve(event.data);
-    }
-  });
-  state.sttWorker.addEventListener("error", (event) => {
-    state.sttWorkerRequests.forEach((pending) => pending.reject(event.error || new Error(event.message)));
-    state.sttWorkerRequests.clear();
-  });
-  return state.sttWorker;
-}
-
-function callSttWorker(type, payload = {}, transfer = []) {
-  const worker = getSttWorker();
-  const id = state.sttNextRequestId;
-  state.sttNextRequestId += 1;
-  return new Promise((resolve, reject) => {
-    state.sttWorkerRequests.set(id, { resolve, reject });
-    worker.postMessage({ id, type, ...payload }, transfer);
-  });
-}
-
-async function restoreCachedTranscript() {
-  const cached = await loadCachedTranscript();
-  if (cached) {
-    setTranscript(cached, "transcriptCached");
-  } else {
-    syncTranscriptionUi();
-  }
-}
-
-async function loadCachedTranscript() {
-  const cacheKey = getTranscriptCacheKey();
-  if (!cacheKey) {
-    return null;
-  }
-  const cached = await idbGet("transcripts", cacheKey);
-  return cached?.transcript || null;
-}
-
-async function saveCachedTranscript(transcript) {
-  const cacheKey = getTranscriptCacheKey();
-  if (!cacheKey) {
-    return;
-  }
-  await idbPut("transcripts", {
-    id: cacheKey,
-    transcript,
-    savedAt: new Date().toISOString(),
-  });
-}
-
-function getTranscriptCacheKey() {
-  if (!state.currentFileHash || !state.currentFileSize) {
-    return "";
-  }
-  return [
-    state.currentFileHash,
-    state.currentFileSize,
-    STT_MODEL.id,
-    STT_MODEL.version,
-    state.settings.transcriptionLanguage,
-    STT_CHUNK_ALGORITHM_VERSION,
-    state.settings.silenceThreshold,
-    state.settings.minSilenceSeconds,
-    state.settings.minAudibleSeconds,
-  ].join(":");
-}
-
-function setTranscript(transcript, statusKey = "transcriptReady") {
-  state.transcript = {
-    ...transcript,
-    segments: mergeTranscriptSegments(transcript.segments || []),
-  };
-  state.activeTranscriptIndex = -1;
-  renderTranscript();
-  setTranscriptStatus(statusKey);
-  syncTranscriptionUi();
-  updateActiveTranscript(getCurrentTime());
-}
-
-function resetTranscriptState() {
-  state.transcript = null;
-  state.activeTranscriptIndex = -1;
-  state.sttStatusKey = "";
-  state.sttStatusParams = {};
-  hideSubtitles();
-  renderTranscript();
-  syncTranscriptionUi();
-}
-
-function setTranscriptStatus(key, params = {}, isError = false) {
-  state.sttStatusKey = key;
-  state.sttStatusParams = params;
-  transcriptStatus.textContent = translate(key, params);
-  transcriptStatus.classList.toggle("is-error", isError);
-  transcriptStatus.classList.remove("is-hidden");
-  sttSettingsStatus.textContent = translate(key, params);
-  sttSettingsStatus.classList.toggle("is-error", isError);
-  sttSettingsStatus.classList.remove("is-hidden");
-}
-
-function normalizeTranscriptSegments(segments, chunkStart, chunkEnd, language) {
-  return (segments || [])
-    .map((segment) => ({
-      start: clampNumber(Number(segment.start), chunkStart, chunkEnd),
-      end: clampNumber(Number(segment.end), chunkStart, chunkEnd),
-      text: String(segment.text || "").trim(),
-      language: segment.language || language,
-      confidence: segment.confidence ?? null,
-      noSpeech: segment.noSpeech ?? null,
-    }))
-    .filter((segment) => segment.text && segment.end >= segment.start);
-}
-
-function mergeTranscriptSegments(segments) {
-  return [...segments]
-    .sort((a, b) => a.start - b.start)
-    .map((segment, index, sorted) => {
-      const next = sorted[index + 1];
-      const fallbackEnd = segment.end || segment.start + 2;
-      return {
-        ...segment,
-        end: Math.max(segment.start, Math.min(next?.start ?? fallbackEnd, fallbackEnd)),
-      };
-    });
-}
-
-function renderTranscript() {
-  if (!transcriptList) {
-    return;
-  }
-
-  transcriptList.textContent = "";
-  const segments = state.transcript?.segments || [];
-  if (!segments.length) {
-    const empty = document.createElement("p");
-    empty.className = "settings-note";
-    empty.textContent = translate("transcriptEmpty");
-    transcriptList.append(empty);
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-  segments.forEach((segment, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "transcript-segment";
-    button.dataset.index = String(index);
-    button.setAttribute("role", "listitem");
-    button.addEventListener("click", () => {
-      setCurrentTime(segment.start);
-      updateActiveTranscript(segment.start);
-    });
-
-    const time = document.createElement("span");
-    time.className = "transcript-time";
-    time.textContent = formatTime(segment.start);
-    const text = document.createElement("span");
-    text.className = "transcript-text";
-    text.textContent = segment.text;
-    button.append(time, text);
-    fragment.append(button);
-  });
-  transcriptList.append(fragment);
-}
-
-function updateActiveTranscript(current) {
-  const segments = state.transcript?.segments || [];
-  if (!segments.length) {
-    return;
-  }
-
-  const index = segments.findIndex((segment) => current >= segment.start && current < Math.max(segment.end, segment.start + 1));
-  if (index === state.activeTranscriptIndex) {
-    updateSubtitleText(index);
-    return;
-  }
-
-  const previous = transcriptList.querySelector(".transcript-segment.is-active");
-  previous?.classList.remove("is-active");
-  state.activeTranscriptIndex = index;
-  if (index >= 0) {
-    const active = transcriptList.querySelector(`[data-index="${index}"]`);
-    active?.classList.add("is-active");
-    if (isTranscriptOpen()) {
-      active?.scrollIntoView({ block: "nearest" });
-    }
-  }
-  updateSubtitleText(index);
-}
-
-function openTranscript() {
-  if (!state.transcript?.segments?.length) {
-    return;
-  }
-  transcriptBackdrop.classList.remove("is-hidden");
-  transcriptBackdrop.setAttribute("aria-hidden", "false");
-  updateActiveTranscript(getCurrentTime());
-  transcriptClose.focus();
-}
-
-function closeTranscript() {
-  transcriptBackdrop.classList.add("is-hidden");
-  transcriptBackdrop.setAttribute("aria-hidden", "true");
-  transcriptButton.focus();
-}
-
-function isTranscriptOpen() {
-  return !transcriptBackdrop.classList.contains("is-hidden");
-}
-
-function toggleSubtitles() {
-  if (state.isSubtitleVisible) {
-    hideSubtitles();
-  } else {
-    showSubtitles();
-  }
-}
-
-function showSubtitles() {
-  if (!state.transcript?.segments?.length) {
-    return;
-  }
-  state.isSubtitleVisible = true;
-  subtitleWindow.classList.remove("is-hidden");
-  updateActiveTranscript(getCurrentTime());
-  constrainSubtitleWindow();
-}
-
-function hideSubtitles() {
-  state.isSubtitleVisible = false;
-  subtitleWindow?.classList.add("is-hidden");
-}
-
-function updateSubtitleText(index) {
-  if (!state.isSubtitleVisible || !subtitleText) {
-    return;
-  }
-  const segment = state.transcript?.segments?.[index];
-  subtitleText.textContent = segment?.text || translate("subtitlePlaceholder");
-}
-
-function startSubtitleDrag(event) {
-  if (event.target.closest("button")) {
-    return;
-  }
-  const rect = subtitleWindow.getBoundingClientRect();
-  state.subtitleDrag = {
-    pointerId: event.pointerId,
-    offsetX: event.clientX - rect.left,
-    offsetY: event.clientY - rect.top,
-  };
-  subtitleDragHandle.setPointerCapture(event.pointerId);
-}
-
-function moveSubtitleDrag(event) {
-  if (!state.subtitleDrag || event.pointerId !== state.subtitleDrag.pointerId) {
-    return;
-  }
-  setSubtitleWindowPosition(
-    event.clientX - state.subtitleDrag.offsetX,
-    event.clientY - state.subtitleDrag.offsetY,
-  );
-}
-
-function stopSubtitleDrag(event) {
-  if (!state.subtitleDrag || event.pointerId !== state.subtitleDrag.pointerId) {
-    return;
-  }
-  state.subtitleDrag = null;
-  constrainSubtitleWindow();
-}
-
-function setSubtitleWindowPosition(left, top) {
-  const rect = subtitleWindow.getBoundingClientRect();
-  const maxLeft = window.innerWidth - rect.width - 8;
-  const maxTop = window.innerHeight - rect.height - 8;
-  subtitleWindow.style.left = `${clampNumber(left, 8, Math.max(8, maxLeft))}px`;
-  subtitleWindow.style.top = `${clampNumber(top, 8, Math.max(8, maxTop))}px`;
-  subtitleWindow.style.right = "auto";
-  subtitleWindow.style.bottom = "auto";
-}
-
-function constrainSubtitleWindow() {
-  if (!subtitleWindow || subtitleWindow.classList.contains("is-hidden")) {
-    return;
-  }
-  const rect = subtitleWindow.getBoundingClientRect();
-  setSubtitleWindowPosition(rect.left, rect.top);
-}
-
-function openSttDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(STT_DB_NAME, STT_DB_VERSION);
-    request.addEventListener("upgradeneeded", () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains("models")) {
-        db.createObjectStore("models", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("transcripts")) {
-        db.createObjectStore("transcripts", { keyPath: "id" });
-      }
-    });
-    request.addEventListener("success", () => resolve(request.result));
-    request.addEventListener("error", () => reject(request.error));
-  });
-}
-
-async function idbGet(storeName, id) {
-  const db = await openSttDb();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, "readonly");
-    const request = transaction.objectStore(storeName).get(id);
-    request.addEventListener("success", () => resolve(request.result || null));
-    request.addEventListener("error", () => reject(request.error));
-    transaction.addEventListener("complete", () => db.close());
-  });
-}
-
-async function idbPut(storeName, value) {
-  const db = await openSttDb();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, "readwrite");
-    transaction.objectStore(storeName).put(value);
-    transaction.addEventListener("complete", () => {
-      db.close();
-      resolve();
-    });
-    transaction.addEventListener("error", () => {
-      db.close();
-      reject(transaction.error);
-    });
-  });
-}
-
-async function idbDelete(storeName, id) {
-  const db = await openSttDb();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, "readwrite");
-    transaction.objectStore(storeName).delete(id);
-    transaction.addEventListener("complete", () => {
-      db.close();
-      resolve();
-    });
-    transaction.addEventListener("error", () => {
-      db.close();
-      reject(transaction.error);
-    });
-  });
-}
-
-async function sha256ArrayBuffer(buffer) {
-  const digest = await crypto.subtle.digest("SHA-256", buffer.slice(0));
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function formatMegabytes(bytes) {
-  return (bytes / (1024 * 1024)).toFixed(1);
 }
 
 function formatTime(seconds) {
@@ -3592,9 +2137,8 @@ function formatFileSize(bytes) {
 
 function translate(key, params = {}) {
   const dictionary = translations[state.language] || translations.en;
-  const sttDictionary = sttTranslations[state.language] || sttTranslations[state.language?.split("-")[0]] || {};
   const fallback = translations.en[key] || key;
-  const template = dictionary[key] || sttDictionary[key] || fallback;
+  const template = dictionary[key] || fallback;
   return Object.entries(params).reduce(
     (text, [name, value]) => text.replaceAll(`{${name}}`, value),
     template,
@@ -3645,17 +2189,12 @@ function getSavedSettings(defaultLanguage) {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     const language = translations[stored.language] ? stored.language : fallback.language;
     const theme = ["auto", "dark", "light"].includes(stored.theme) ? stored.theme : fallback.theme;
-    const transcriptionLanguage = STT_LANGUAGES.has(stored.transcriptionLanguage)
-      ? stored.transcriptionLanguage
-      : fallback.transcriptionLanguage;
     return {
       language,
       theme,
       silenceThreshold: clampNumber(Number(stored.silenceThreshold ?? fallback.silenceThreshold), 0.005, 0.08),
       minSilenceSeconds: clampNumber(Number(stored.minSilenceSeconds ?? fallback.minSilenceSeconds), 1, 30),
       minAudibleSeconds: clampNumber(Number(stored.minAudibleSeconds ?? fallback.minAudibleSeconds), 0.1, 3),
-      transcriptionEnabled: Boolean(stored.transcriptionEnabled ?? fallback.transcriptionEnabled),
-      transcriptionLanguage,
     };
   } catch (error) {
     return fallback;
@@ -3672,8 +2211,6 @@ function persistSettings() {
         silenceThreshold: state.settings.silenceThreshold,
         minSilenceSeconds: state.settings.minSilenceSeconds,
         minAudibleSeconds: state.settings.minAudibleSeconds,
-        transcriptionEnabled: state.settings.transcriptionEnabled,
-        transcriptionLanguage: state.settings.transcriptionLanguage,
       }),
     );
   } catch (error) {
@@ -3708,8 +2245,6 @@ function applyLanguage() {
     loadingDetail.textContent = translate(state.busyDetailKey, state.busyDetailParams);
   }
 
-  syncTranscriptionUi();
-  renderTranscript();
   updatePlayControlWidth();
   setPlayButton(state.isPlaying);
 }
