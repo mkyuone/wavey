@@ -10,7 +10,7 @@ function seekToNextAudio() {
 }
 
 async function togglePlayback() {
-  if (!state.audioBuffer) {
+  if (!hasLoadedMedia()) {
     return;
   }
 
@@ -22,7 +22,7 @@ async function togglePlayback() {
 }
 
 function handleKeyboardControls(event) {
-  if (event.defaultPrevented || isSettingsOpen() || !state.audioBuffer) {
+  if (event.defaultPrevented || isSettingsOpen() || !hasLoadedMedia()) {
     return;
   }
 
@@ -120,7 +120,7 @@ function updateTimeUi() {
 }
 
 function getAnalysisDuration() {
-  return state.audioBuffer?.duration || 0;
+  return getFiniteDuration(state.analysisDuration) || state.audioBuffer?.duration || 0;
 }
 
 function getMediaDuration() {
@@ -147,13 +147,17 @@ async function ensureAudioGraph() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     state.audioContext = new AudioContextClass();
     state.gainNode = state.audioContext.createGain();
+    state.boostShaperNode = state.audioContext.createWaveShaper();
     state.limiterNode = state.audioContext.createDynamicsCompressor();
     state.limiterNode.threshold.value = -1;
     state.limiterNode.knee.value = 0;
     state.limiterNode.ratio.value = 20;
     state.limiterNode.attack.value = 0.003;
-    state.limiterNode.release.value = 0.08;
-    state.gainNode.connect(state.limiterNode);
+    state.limiterNode.release.value = 0.12;
+    state.boostShaperNode.curve = createBoostCurve(1);
+    state.boostShaperNode.oversample = "2x";
+    state.gainNode.connect(state.boostShaperNode);
+    state.boostShaperNode.connect(state.limiterNode);
     state.limiterNode.connect(state.audioContext.destination);
   }
 
@@ -164,18 +168,45 @@ async function ensureAudioGraph() {
   updateOutputGain();
 }
 
-async function startPlayback() {
-  if (!state.audioBuffer) {
-    return;
+async function ensureMediaElementAudioGraph() {
+  if (!state.mediaElement) {
+    return false;
   }
 
   await ensureAudioGraph();
+  if (!state.mediaElementSource) {
+    state.mediaElementSource = state.audioContext.createMediaElementSource(state.mediaElement);
+    state.mediaElementSource.connect(state.gainNode);
+  }
+  state.mediaElement.volume = 1;
+  updateOutputGain();
+  return true;
+}
+
+async function startPlayback() {
+  if (!hasLoadedMedia()) {
+    return;
+  }
+
   if (state.playbackOffset >= getMediaDuration() - SEEK_EPSILON) {
     state.playbackOffset = 0;
   }
-  if (!startAudioSource()) {
+
+  if (usesMediaElementPlayback()) {
+    if (!await startMediaElement()) {
+      return;
+    }
+  } else {
+    await ensureAudioGraph();
+    if (!startAudioSource()) {
+      return;
+    }
+  }
+
+  if (!hasLoadedMedia()) {
     return;
   }
+
   state.isPlaying = true;
   setPlayButton(true);
   startDrawingLoop();
@@ -188,7 +219,7 @@ function pausePlayback() {
 
   state.playbackOffset = getCurrentTime();
   state.isPlaying = false;
-  stopAudioSource();
+  stopActivePlaybackSource();
   setPlayButton(false);
   cancelAnimationFrame(state.animationFrame);
   updateTimeUi();
@@ -198,7 +229,7 @@ function pausePlayback() {
 function stopPlayback() {
   state.isPlaying = false;
   state.playbackOffset = 0;
-  stopAudioSource();
+  stopActivePlaybackSource();
   setPlayButton(false);
   cancelAnimationFrame(state.animationFrame);
 }
@@ -209,8 +240,17 @@ function restartPlaybackAtCurrentTime() {
     return;
   }
 
-  stopAudioSource();
-  startAudioSource();
+  if (usesMediaElementPlayback()) {
+    setMediaElementCurrentTime(state.playbackOffset);
+    state.mediaElement.play().catch(() => {
+      state.isPlaying = false;
+      setPlayButton(false);
+      cancelAnimationFrame(state.animationFrame);
+    });
+  } else {
+    stopAudioSource();
+    startAudioSource();
+  }
 }
 
 function startAudioSource() {
@@ -259,9 +299,17 @@ function stopAudioSource() {
   }
 }
 
+function stopActivePlaybackSource() {
+  if (usesMediaElementPlayback()) {
+    stopMediaElement();
+  } else {
+    stopAudioSource();
+  }
+}
+
 function finishPlayback() {
   state.isPlaying = false;
-  stopAudioSource();
+  stopActivePlaybackSource();
   state.playbackOffset = getMediaDuration();
   setPlayButton(false);
   cancelAnimationFrame(state.animationFrame);
@@ -271,6 +319,13 @@ function finishPlayback() {
 
 function getCurrentTime() {
   const duration = getMediaDuration();
+  if (usesMediaElementPlayback()) {
+    if (!state.isPlaying) {
+      return clampTime(state.playbackOffset, duration);
+    }
+    return clampTime(state.mediaElement?.currentTime || state.playbackOffset, duration);
+  }
+
   if (!state.isPlaying || !state.audioContext) {
     return clampTime(state.playbackOffset, duration);
   }
@@ -284,11 +339,77 @@ function updateOutputGain() {
   const volumeGain = volume / 100;
 
   volumeValue.textContent = `${volume}%`;
+  updateVolumeIcon(volume);
   updateRangeFill(volumeSlider);
 
   if (state.gainNode) {
     state.gainNode.gain.setTargetAtTime(volumeGain, state.audioContext.currentTime, 0.01);
+    updateBoostCurve(volumeGain);
+    updateBoostLimiter(volumeGain);
   }
+  if (state.mediaElement) {
+    state.mediaElement.volume = state.mediaElementSource ? 1 : clampNumber(volumeGain, 0, 1);
+  }
+}
+
+function updateVolumeIcon(volume) {
+  if (!volumeIcon) {
+    return;
+  }
+
+  if (volume <= 0) {
+    volumeIcon.textContent = "volume_off";
+  } else if (volume < 40) {
+    volumeIcon.textContent = "volume_mute";
+  } else {
+    volumeIcon.textContent = "volume_up";
+  }
+  volumeIcon.toggleAttribute("data-volume-boosted", volume > 100);
+}
+
+function updateBoostCurve(volumeGain) {
+  if (!state.boostShaperNode) {
+    return;
+  }
+
+  const boostKey = volumeGain > 1 ? `boost-${Math.round(volumeGain * 100)}` : "linear";
+  if (state.boostCurveKey === boostKey) {
+    return;
+  }
+
+  state.boostShaperNode.curve = createBoostCurve(volumeGain);
+  state.boostCurveKey = boostKey;
+}
+
+function updateBoostLimiter(volumeGain) {
+  if (!state.limiterNode || !state.audioContext) {
+    return;
+  }
+
+  const now = state.audioContext.currentTime;
+  const isBoosted = volumeGain > 1;
+  state.limiterNode.threshold.setTargetAtTime(isBoosted ? -3 : -1, now, 0.01);
+  state.limiterNode.knee.setTargetAtTime(isBoosted ? 14 : 0, now, 0.01);
+  state.limiterNode.ratio.setTargetAtTime(isBoosted ? 6 : 20, now, 0.01);
+}
+
+function createBoostCurve(volumeGain) {
+  const sampleCount = 2048;
+  const curve = new Float32Array(sampleCount);
+  if (volumeGain <= 1) {
+    for (let index = 0; index < sampleCount; index += 1) {
+      curve[index] = (index / (sampleCount - 1)) * 2 - 1;
+    }
+    return curve;
+  }
+
+  const drive = 1 + Math.min(volumeGain - 1, 2) * 0.85;
+  const normalizer = Math.tanh(drive);
+  for (let index = 0; index < sampleCount; index += 1) {
+    const input = (index / (sampleCount - 1)) * 2 - 1;
+    curve[index] = Math.tanh(input * drive) / normalizer;
+  }
+  return curve;
 }
 
 function updatePlaybackSpeed() {
@@ -302,9 +423,97 @@ function updatePlaybackSpeed() {
   if (state.audioSource) {
     state.audioSource.playbackRate.value = speed;
   }
+  if (state.mediaElement) {
+    state.mediaElement.playbackRate = speed;
+  }
 
   speedValue.textContent = `${speed.toFixed(2)}x`;
   updateRangeFill(speedSlider);
+}
+
+function hasLoadedMedia() {
+  return Boolean(state.audioBuffer || state.mediaElement || getAnalysisDuration());
+}
+
+function usesMediaElementPlayback() {
+  return state.playbackBackend === "media" && Boolean(state.mediaElement);
+}
+
+async function startMediaElement() {
+  const element = state.mediaElement;
+  if (!element) {
+    return false;
+  }
+
+  const duration = getMediaDuration();
+  const offset = clampTime(state.playbackOffset, duration);
+  if (offset >= duration) {
+    finishPlayback();
+    return false;
+  }
+
+  element.playbackRate = state.playbackRate;
+
+  try {
+    await waitForPlaybackMediaMetadata(element);
+    if (!await ensureMediaElementAudioGraph()) {
+      return false;
+    }
+    setMediaElementCurrentTime(offset);
+    state.playbackOffset = offset;
+    await element.play();
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+function stopMediaElement() {
+  const element = state.mediaElement;
+  if (!element) {
+    return;
+  }
+
+  element.pause();
+}
+
+function setMediaElementCurrentTime(seconds) {
+  const element = state.mediaElement;
+  if (!element) {
+    return;
+  }
+
+  try {
+    element.currentTime = clampTime(seconds, getMediaDuration());
+  } catch (error) {
+    // Some media elements reject seeks before metadata is fully ready.
+  }
+}
+
+function waitForPlaybackMediaMetadata(element) {
+  if (element.readyState >= HTMLMediaElement.HAVE_METADATA) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      element.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      element.removeEventListener("error", handleError);
+    };
+    const handleLoadedMetadata = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new Error("Could not load media metadata."));
+    };
+
+    element.addEventListener("loadedmetadata", handleLoadedMetadata, { once: true });
+    element.addEventListener("error", handleError, { once: true });
+    element.load();
+  });
 }
 
 function setJumpAmount(seconds) {

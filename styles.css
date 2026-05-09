@@ -875,6 +875,7 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .jump-control {
+  position: relative;
   display: grid;
   grid-template-columns: 48px minmax(76px, 1fr) 48px;
   align-items: center;
@@ -886,7 +887,7 @@ input[type="range"]:focus::-moz-range-thumb {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .jump-control button {
@@ -1036,9 +1037,32 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .speed-control .control-label,
 .volume-control label {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
+}
+
+.volume-control .ui-icon {
+  position: relative;
+  width: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.volume-control .ui-icon[data-volume-boosted]::after {
+  content: "+";
+  position: absolute;
+  top: -0.42em;
+  right: -0.38em;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.7em;
+  font-weight: 650;
+  line-height: 1;
+  transform: scaleX(0.92);
+  transform-origin: center;
 }
 
 .volume-control {

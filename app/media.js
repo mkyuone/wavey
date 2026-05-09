@@ -14,22 +14,25 @@ async function loadFile(file) {
   }
 
   try {
-    const arrayBuffer = await readFileAsArrayBuffer(file, (percent) => {
+    let arrayBuffer = await readFileAsArrayBuffer(file, (percent) => {
       setBusy(true, "processingAudio", "readingFileProgress", { percent: Math.round(percent) }, percent);
     });
     setBusy(true, "processingAudio", "decodingAudio", {}, null);
     await nextPaint();
-    const decodedBuffer = await decodeMediaFile(file, arrayBuffer, mediaKind);
+    const decodedMedia = await decodeMediaFile(file, arrayBuffer, mediaKind);
+    arrayBuffer = null;
+    let decodedBuffer = decodedMedia.buffer;
 
     stopPlayback();
+    resetPlaybackMedia();
     hideWaveformHover();
     clearAnalysisCaches();
     state.audioBuffer = decodedBuffer;
+    state.analysisDuration = decodedBuffer.duration;
     state.mediaDuration = decodedBuffer.duration;
+    state.playbackBackend = "buffer";
     state.playbackOffset = 0;
     resetTimeUiCache();
-    updatePlaybackSpeed();
-    updateOutputGain();
 
     fileName.textContent = file.name;
     fileDetails.textContent = `${formatFileSize(file.size)} · ${formatTime(getMediaDuration())}`;
@@ -54,6 +57,17 @@ async function loadFile(file) {
     setAnalysisStatus();
     setBusy(true, "processingAudio", "findingSilence", {}, 100);
     await nextPaint();
+
+    if (shouldUseMemorySavingPlayback(decodedBuffer)) {
+      prepareMemorySavingPlayback(file, mediaKind, decodedMedia.playbackBlob);
+      state.audioBuffer = null;
+      state.monoSamples = null;
+      decodedMedia.buffer = null;
+      decodedBuffer = null;
+    }
+
+    updatePlaybackSpeed();
+    updateOutputGain();
     setBusy(false);
     maybeShowWaveformSeekHint();
   } catch (error) {
@@ -107,7 +121,10 @@ function getFileExtension(name) {
 
 async function decodeMediaFile(file, arrayBuffer, mediaKind) {
   try {
-    return await decodeAudioArrayBuffer(arrayBuffer);
+    return {
+      buffer: await decodeAudioArrayBuffer(arrayBuffer),
+      playbackBlob: null,
+    };
   } catch (error) {
     if (mediaKind !== "video") {
       throw new UnsupportedMediaError(error?.message || "Browser could not decode the audio codec.");
@@ -117,6 +134,60 @@ async function decodeMediaFile(file, arrayBuffer, mediaKind) {
   setBusy(true, "processingAudio", "extractingAudio", {}, null);
   await nextPaint();
   return extractAudioFromVideo(file);
+}
+
+function shouldUseMemorySavingPlayback(buffer) {
+  return getFiniteDuration(buffer?.duration) >= LONG_FILE_MEMORY_SAVE_SECONDS;
+}
+
+function prepareMemorySavingPlayback(file, mediaKind, playbackBlob = null) {
+  const playbackSource = playbackBlob || file;
+  const elementTag = playbackBlob || mediaKind === "audio" ? "audio" : "video";
+  const element = document.createElement(elementTag);
+  element.preload = "metadata";
+  element.controls = false;
+  element.playsInline = true;
+  element.style.cssText = "position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none;";
+  element.addEventListener("ended", () => {
+    if (state.playbackBackend === "media" && state.isPlaying) {
+      finishPlayback();
+    }
+  });
+  element.addEventListener("pause", () => {
+    if (state.playbackBackend === "media" && state.isPlaying && element.currentTime >= getMediaDuration() - SEEK_EPSILON) {
+      finishPlayback();
+    }
+  });
+
+  state.mediaObjectUrl = URL.createObjectURL(playbackSource);
+  element.src = state.mediaObjectUrl;
+  document.body.append(element);
+  state.mediaElement = element;
+  state.playbackBackend = "media";
+}
+
+function resetPlaybackMedia() {
+  const element = state.mediaElement;
+  state.mediaElement = null;
+
+  if (state.mediaElementSource) {
+    state.mediaElementSource.disconnect();
+    state.mediaElementSource = null;
+  }
+
+  if (element) {
+    element.pause();
+    element.removeAttribute("src");
+    element.load();
+    element.remove();
+  }
+
+  if (state.mediaObjectUrl) {
+    URL.revokeObjectURL(state.mediaObjectUrl);
+    state.mediaObjectUrl = "";
+  }
+
+  state.playbackBackend = "buffer";
 }
 
 async function decodeAudioArrayBuffer(arrayBuffer) {
@@ -202,7 +273,10 @@ async function extractAudioFromVideo(file) {
 
     const extractedBlob = new Blob(chunks, { type: recorder.mimeType || recordMimeType || "audio/webm" });
     const extractedArrayBuffer = await extractedBlob.arrayBuffer();
-    return decodeAudioArrayBuffer(extractedArrayBuffer);
+    return {
+      buffer: await decodeAudioArrayBuffer(extractedArrayBuffer),
+      playbackBlob: extractedBlob,
+    };
   } catch (error) {
     if (error instanceof UnsupportedMediaError) {
       throw error;

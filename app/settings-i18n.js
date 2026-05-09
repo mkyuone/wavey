@@ -130,7 +130,7 @@ function resetDefaultSettings() {
 }
 
 function reanalyzeSilenceSettings() {
-  if (!state.audioBuffer || !state.rmsFrames.length) {
+  if (!hasLoadedMedia() || !state.rmsFrames.length) {
     return;
   }
   updateAutoThreshold();
@@ -370,7 +370,7 @@ function applyLanguage() {
   document.documentElement.lang = state.language;
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
-    if (element.id === "fileName" && state.audioBuffer) {
+    if (element.id === "fileName" && hasLoadedMedia()) {
       return;
     }
     element.textContent = translate(element.dataset.i18n);
@@ -382,7 +382,7 @@ function applyLanguage() {
 
   if (state.errorKey) {
     setError(state.errorKey);
-  } else if (state.audioBuffer) {
+  } else if (hasLoadedMedia()) {
     setAnalysisStatus();
   } else {
     setStatus(state.statusKey, state.statusParams);
@@ -520,7 +520,7 @@ function scheduleGlobalDragReset() {
 }
 
 function maybeShowWaveformSeekHint() {
-  if (!state.audioBuffer || !state.peaks.length || hasSeenWaveformSeekHint()) {
+  if (!hasLoadedMedia() || !state.peaks.length || hasSeenWaveformSeekHint()) {
     return;
   }
 

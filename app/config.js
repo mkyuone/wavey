@@ -1,6 +1,6 @@
 // AudioNavigator configuration, DOM references, state, and i18n.
 const fileInput = document.querySelector("#fileInput");
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.1.0";
 const APP_VERSION_CHANNEL = "";
 const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CHANNEL}` : APP_VERSION;
 window.AudioNavigator = window.AudioNavigator || {};
@@ -51,6 +51,7 @@ const speedSlider = document.querySelector("#speedSlider");
 const speedValue = document.querySelector("#speedValue");
 const volumeSlider = document.querySelector("#volumeSlider");
 const volumeValue = document.querySelector("#volumeValue");
+const volumeIcon = document.querySelector(".volume-control .ui-icon");
 const nextAudio = document.querySelector("#nextAudio");
 const loadingOverlay = document.querySelector("#loadingOverlay");
 const loadingTitle = document.querySelector("#loadingTitle");
@@ -935,7 +936,12 @@ const state = {
   settingsStorageHydrated: false,
   settingsChangedBeforeHydration: false,
   audioBuffer: null,
+  analysisDuration: 0,
   mediaDuration: 0,
+  playbackBackend: "buffer",
+  mediaElement: null,
+  mediaElementSource: null,
+  mediaObjectUrl: "",
   monoSamples: null,
   peaks: [],
   rmsFrames: [],
@@ -945,6 +951,7 @@ const state = {
   audioContext: null,
   audioSource: null,
   gainNode: null,
+  boostShaperNode: null,
   limiterNode: null,
   playbackOffset: 0,
   playbackStartedAt: 0,
@@ -969,6 +976,7 @@ const state = {
   pwaReloadingForUpdate: false,
   globalDragDepth: 0,
   globalDragResetTimer: 0,
+  boostCurveKey: "",
   staticWaveformCanvas: null,
   staticWaveformContext: null,
   canvasPixelWidth: 0,
@@ -981,6 +989,7 @@ const state = {
 const RMS_WINDOW_SECONDS = 0.05;
 const SEEK_EPSILON = 0.08;
 const ANALYSIS_CHUNK_DURATION_MS = 16;
+const LONG_FILE_MEMORY_SAVE_SECONDS = 30 * 60;
 const DESKTOP_MIN_INTERACTIVE_WIDTH = 760;
 const SUPPORTED_AUDIO_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "oga", "ogg", "opus", "wav", "weba"]);
 const SUPPORTED_VIDEO_EXTENSIONS = new Set(["avi", "m4v", "mkv", "mov", "mp4", "webm"]);

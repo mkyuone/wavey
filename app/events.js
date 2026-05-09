@@ -194,7 +194,7 @@ updateRangeFill(volumeSlider);
 updateRangeFill(speedSlider);
 
 canvas.addEventListener("pointerdown", (event) => {
-  if (!state.audioBuffer) {
+  if (!hasLoadedMedia()) {
     return;
   }
   canvas.setPointerCapture(event.pointerId);

@@ -184,7 +184,7 @@ function drawWaveform() {
     ctx.drawImage(state.staticWaveformCanvas, 0, 0);
   }
 
-  if (state.audioBuffer && state.peaks.length) {
+  if (hasLoadedMedia() && state.peaks.length) {
     drawPlayhead(ctx, width, height);
     drawWaveformHover(ctx, width, height);
   }
@@ -205,7 +205,7 @@ function renderStaticWaveform(width, height) {
   staticCtx.fillStyle = getThemeColor("--canvas-bg");
   staticCtx.fillRect(0, 0, width, height);
 
-  if (!state.audioBuffer || !state.peaks.length) {
+  if (!hasLoadedMedia() || !state.peaks.length) {
     return;
   }
 
@@ -378,7 +378,7 @@ function hideWaveformHover() {
 function canShowWaveformHover(event) {
   const hasFineHover = window.matchMedia?.("(hover: hover) and (pointer: fine)").matches !== false;
   return Boolean(
-    state.audioBuffer
+    hasLoadedMedia()
       && state.peaks.length
       && !state.isPointerSeeking
       && hasFineHover
