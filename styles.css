@@ -117,12 +117,62 @@
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   background: var(--bg);
   color: var(--ink);
   font-size: 1rem;
   overflow-y: auto;
   user-select: none;
+}
+
+html,
+body,
+.settings-content,
+.license-content,
+.license-section pre,
+.custom-menu {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.settings-content::-webkit-scrollbar,
+.license-content::-webkit-scrollbar,
+.license-section pre::-webkit-scrollbar,
+.custom-menu::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.settings-content::-webkit-scrollbar-track,
+.license-content::-webkit-scrollbar-track,
+.license-section pre::-webkit-scrollbar-track,
+.custom-menu::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.settings-content::-webkit-scrollbar-thumb,
+.license-content::-webkit-scrollbar-thumb,
+.license-section pre::-webkit-scrollbar-thumb,
+.custom-menu::-webkit-scrollbar-thumb {
+  border: 3px solid var(--scrollbar-track);
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+.settings-content::-webkit-scrollbar-corner,
+.license-content::-webkit-scrollbar-corner,
+.license-section pre::-webkit-scrollbar-corner,
+.custom-menu::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 button,
@@ -205,6 +255,7 @@ body:has(.settings-backdrop:not(.is-hidden)) {
 
 .icon-button > span:not(.ui-icon),
 .file-button > span:not(.ui-icon),
+.install-button > span:not(.ui-icon),
 .drop-copy button > span:not(.ui-icon) {
   display: inline-flex;
   align-items: center;
@@ -247,6 +298,22 @@ body:has(.settings-backdrop:not(.is-hidden)) {
   padding: 0 18px;
   font-size: 1rem;
   font-weight: 600;
+}
+
+.install-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui), (display-mode: window-controls-overlay) {
+  .install-button {
+    display: none !important;
+  }
 }
 
 .settings-button,
@@ -483,33 +550,33 @@ canvas {
   cursor: crosshair;
 }
 
-@media (min-height: 700px) {
+@media (min-height: 520px) {
   body:has(#playerPanel:not(.is-hidden)) {
     overflow: hidden;
   }
 
   body:has(#playerPanel:not(.is-hidden)) .app-shell {
-    height: min(100dvh, 980px);
+    height: 100dvh;
+    max-height: 980px;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   #playerPanel:not(.is-hidden) {
-    align-self: start;
+    height: 100%;
     min-height: 0;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto minmax(150px, 1fr) auto auto;
   }
 
   #playerPanel:not(.is-hidden) .waveform-wrap {
     min-height: 0;
-    height: clamp(300px, calc(100dvh - 440px), 520px);
-    max-height: 520px;
+    height: auto;
+    max-height: none;
   }
 
   #playerPanel:not(.is-hidden) canvas {
     height: 100%;
-    min-height: 220px;
-    max-height: 520px;
+    min-height: 0;
   }
 }
 
@@ -977,9 +1044,7 @@ output {
   margin: 0;
   padding: 14px;
   overflow: auto;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-gutter: stable;
-  scrollbar-width: thin;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-soft);
@@ -990,24 +1055,13 @@ output {
 }
 
 .license-section pre::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
 }
 
 .license-section pre::-webkit-scrollbar-track {
   border-left: 1px solid var(--line);
   border-radius: 0 8px 8px 0;
-  background: var(--scrollbar-track);
-}
-
-.license-section pre::-webkit-scrollbar-thumb {
-  border: 3px solid var(--scrollbar-track);
-  border-radius: 999px;
-  background: var(--scrollbar-thumb);
-}
-
-.license-section pre::-webkit-scrollbar-corner {
-  background: var(--scrollbar-track);
 }
 
 .settings-product,
@@ -1032,6 +1086,7 @@ output {
   gap: 18px;
   padding: 22px 20px 20px;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .settings-content h1,
@@ -1314,16 +1369,27 @@ kbd {
   }
 
   .header-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: stretch;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: stretch;
   }
 
   .file-button,
+  .install-button,
   .speed-control,
   .volume-control {
     width: 100%;
     flex: 1 1 100%;
+  }
+
+  .install-button,
+  .file-button {
+    grid-column: 2;
+  }
+
+  .settings-button {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .status-text {
@@ -1340,11 +1406,11 @@ kbd {
   }
 
   .waveform-wrap {
-    min-height: 280px;
+    min-height: clamp(180px, 36dvh, 280px);
   }
 
   canvas {
-    height: 280px;
+    height: clamp(180px, 36dvh, 280px);
   }
 
   .control-row button {

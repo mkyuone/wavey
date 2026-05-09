@@ -8,6 +8,8 @@ window.APP_VERSION_LABEL = APP_VERSION_LABEL;
 if (APP_VERSION_CHANNEL) {
   document.documentElement.dataset.buildChannel = APP_VERSION_CHANNEL;
 }
+registerPwaServiceWorker();
+const installButton = document.querySelector("#installButton");
 const settingsButton = document.querySelector("#settingsButton");
 const settingsBackdrop = document.querySelector("#settingsBackdrop");
 const settingsModal = document.querySelector("#settingsModal");
@@ -51,6 +53,7 @@ const loadingTitle = document.querySelector("#loadingTitle");
 const loadingDetail = document.querySelector("#loadingDetail");
 const loadingProgressBar = document.querySelector("#loadingProgressBar");
 const loadingProgressTrack = document.querySelector(".progress-track");
+const themeColorMeta = document.querySelector("meta[name='theme-color']");
 const colorSchemeQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
 const themeOptions = [...document.querySelectorAll("input[name='themeMode']")];
 const silenceThresholdInput = document.querySelector("#silenceThresholdInput");
@@ -88,6 +91,7 @@ const translations = {
     openSourceLicenses: "Open source licenses",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols fonts are provided by Google and licensed under the Apache License, Version 2.0.",
+    installApp: "Install app",
     openAudio: "Open audio",
     audioFileUpload: "Audio file upload",
     dropAudio: "Drop an audio file here",
@@ -150,6 +154,7 @@ const translations = {
     openSourceLicenses: "Licencias de código abierto",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Las fuentes Material Symbols son proporcionadas por Google y están bajo la licencia Apache, versión 2.0.",
+    installApp: "Instalar app",
     openAudio: "Abrir audio",
     audioFileUpload: "Subir archivo de audio",
     dropAudio: "Suelta un archivo de audio aquí",
@@ -212,6 +217,7 @@ const translations = {
     openSourceLicenses: "Licences open source",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Les polices Material Symbols sont fournies par Google et sous licence Apache, version 2.0.",
+    installApp: "Installer l'app",
     openAudio: "Ouvrir un audio",
     audioFileUpload: "Importer un fichier audio",
     dropAudio: "Déposez un fichier audio ici",
@@ -274,6 +280,7 @@ const translations = {
     openSourceLicenses: "Open-Source-Lizenzen",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols-Schriften werden von Google bereitgestellt und unter der Apache-Lizenz, Version 2.0, lizenziert.",
+    installApp: "App installieren",
     openAudio: "Audio öffnen",
     audioFileUpload: "Audiodatei hochladen",
     dropAudio: "Audiodatei hier ablegen",
@@ -336,6 +343,7 @@ const translations = {
     openSourceLicenses: "Licenças de código aberto",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "As fontes Material Symbols são fornecidas pelo Google e licenciadas sob a Licença Apache, versão 2.0.",
+    installApp: "Instalar app",
     openAudio: "Abrir áudio",
     audioFileUpload: "Enviar arquivo de áudio",
     dropAudio: "Solte um arquivo de áudio aqui",
@@ -398,6 +406,7 @@ const translations = {
     openSourceLicenses: "Лицензии открытого кода",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Шрифты Material Symbols предоставляются Google и лицензируются по лицензии Apache версии 2.0.",
+    installApp: "Установить",
     openAudio: "Открыть аудио",
     audioFileUpload: "Загрузка аудиофайла",
     dropAudio: "Перетащите аудиофайл сюда",
@@ -460,6 +469,7 @@ const translations = {
     openSourceLicenses: "ओपन सोर्स लाइसेंस",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols फ़ॉन्ट Google द्वारा प्रदान किए जाते हैं और Apache License, Version 2.0 के तहत लाइसेंस प्राप्त हैं।",
+    installApp: "ऐप इंस्टॉल करें",
     openAudio: "ऑडियो खोलें",
     audioFileUpload: "ऑडियो फ़ाइल अपलोड",
     dropAudio: "ऑडियो फ़ाइल यहां छोड़ें",
@@ -522,6 +532,7 @@ const translations = {
     openSourceLicenses: "オープンソースライセンス",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols フォントは Google により提供され、Apache License, Version 2.0 のもとでライセンスされています。",
+    installApp: "アプリをインストール",
     openAudio: "音声を開く",
     audioFileUpload: "音声ファイルをアップロード",
     dropAudio: "ここに音声ファイルをドロップ",
@@ -584,6 +595,7 @@ const translations = {
     openSourceLicenses: "오픈소스 라이선스",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 글꼴은 Google에서 제공하며 Apache License, Version 2.0에 따라 라이선스됩니다.",
+    installApp: "앱 설치",
     openAudio: "오디오 열기",
     audioFileUpload: "오디오 파일 업로드",
     dropAudio: "여기에 오디오 파일을 놓으세요",
@@ -646,6 +658,7 @@ const translations = {
     openSourceLicenses: "开源许可证",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 字体由 Google 提供，并根据 Apache License, Version 2.0 授权。",
+    installApp: "安装应用",
     openAudio: "打开音频",
     audioFileUpload: "上传音频文件",
     dropAudio: "将音频文件拖到这里",
@@ -708,6 +721,7 @@ const translations = {
     openSourceLicenses: "開源授權條款",
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 字型由 Google 提供，並依 Apache License, Version 2.0 授權。",
+    installApp: "安裝 App",
     openAudio: "開啟音訊",
     audioFileUpload: "上傳音訊檔",
     dropAudio: "將音訊檔拖放到這裡",
@@ -792,6 +806,7 @@ const state = {
   isPointerSeeking: false,
   animationFrame: 0,
   resizeFrame: 0,
+  deferredInstallPrompt: null,
   staticWaveformCanvas: null,
   staticWaveformContext: null,
   canvasPixelWidth: 0,
@@ -813,6 +828,10 @@ const RECORDED_AUDIO_MIME_TYPES = [
   "audio/ogg",
   "audio/mp4",
 ];
+const PWA_THEME_COLORS = {
+  light: "#3D59F5",
+  dark: "#242833",
+};
 
 class UnsupportedMediaError extends Error {
   constructor(message = "Unsupported media file.") {
@@ -821,6 +840,7 @@ class UnsupportedMediaError extends Error {
   }
 }
 
+installButton.addEventListener("click", promptPwaInstall);
 settingsButton.addEventListener("click", openSettings);
 settingsClose.addEventListener("click", closeSettings);
 licenseButton.addEventListener("click", openLicenses);
@@ -982,6 +1002,22 @@ if (colorSchemeQuery?.addEventListener) {
 } else if (colorSchemeQuery?.addListener) {
   colorSchemeQuery.addListener(handleColorSchemeChange);
 }
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  if (!isPwaInstallContext()) {
+    return;
+  }
+
+  event.preventDefault();
+  state.deferredInstallPrompt = event;
+  syncInstallButton();
+});
+
+window.addEventListener("appinstalled", () => {
+  state.deferredInstallPrompt = null;
+  syncInstallButton();
+});
+window.addEventListener("pageshow", syncInstallButton);
 
 speedSlider.addEventListener("input", updatePlaybackSpeed);
 
@@ -2068,8 +2104,20 @@ function reanalyzeSilenceSettings() {
 }
 
 function handleColorSchemeChange() {
+  syncThemeColor();
   clearWaveformCache();
   drawWaveform();
+}
+
+function syncThemeColor() {
+  if (!themeColorMeta) {
+    return;
+  }
+
+  const resolvedTheme = state.settings.theme === "auto"
+    ? (colorSchemeQuery?.matches ? "dark" : "light")
+    : state.settings.theme;
+  themeColorMeta.setAttribute("content", PWA_THEME_COLORS[resolvedTheme] || PWA_THEME_COLORS.light);
 }
 
 function getThemeColor(name) {
@@ -2504,11 +2552,18 @@ function smoothPeaks(peaks, radius) {
 function setPlayButton(isPlaying) {
   const label = translate(isPlaying ? "pause" : "play");
   const icon = isPlaying ? "pause" : "play_arrow";
+  const iconElement = playButton.querySelector(".ui-icon");
+  const labelElement = playButton.querySelector("span:last-child");
+
   playButton.setAttribute("aria-label", label);
-  playButton.innerHTML = `
-    <span class="material-symbols-sharp ui-icon" aria-hidden="true">${icon}</span>
-    <span>${label}</span>
-  `;
+
+  if (iconElement) {
+    iconElement.textContent = icon;
+  }
+
+  if (labelElement) {
+    labelElement.textContent = label;
+  }
 }
 
 function setBusy(isBusy, titleKey = "processingAudio", detailKey = "preparingWaveform", detailParams = {}, progress = null) {
@@ -2572,4 +2627,58 @@ function readFileAsArrayBuffer(file, onProgress) {
 
     reader.readAsArrayBuffer(file);
   });
+}
+
+function registerPwaServiceWorker() {
+  const canRegister = "serviceWorker" in navigator
+    && (window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+  if (!canRegister) {
+    return;
+  }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+      console.warn("Could not register AudioNavigator service worker.", error);
+    });
+  });
+}
+
+function isPwaInstallContext() {
+  const isHttpApp = window.location.protocol === "https:"
+    || window.location.hostname === "localhost"
+    || window.location.hostname === "127.0.0.1";
+  return isHttpApp && !isInstalledPwaContext();
+}
+
+function isInstalledPwaContext() {
+  const displayModes = ["standalone", "fullscreen", "minimal-ui", "window-controls-overlay"];
+  return Boolean(window.navigator.standalone)
+    || displayModes.some((mode) => window.matchMedia?.(`(display-mode: ${mode})`).matches);
+}
+
+function syncInstallButton() {
+  if (!isPwaInstallContext()) {
+    state.deferredInstallPrompt = null;
+  }
+
+  installButton.classList.toggle("is-hidden", !state.deferredInstallPrompt || !isPwaInstallContext());
+}
+
+async function promptPwaInstall() {
+  if (!state.deferredInstallPrompt) {
+    return;
+  }
+
+  const installPrompt = state.deferredInstallPrompt;
+  state.deferredInstallPrompt = null;
+  syncInstallButton();
+
+  installPrompt.prompt();
+
+  try {
+    await installPrompt.userChoice;
+  } catch (error) {
+    console.warn("AudioNavigator install prompt was dismissed before a choice was returned.", error);
+  }
 }

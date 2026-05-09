@@ -21,7 +21,10 @@ INCLUDE_PATHS = [
     "favicon.png",
     "index.html",
     "manifest.json",
+    "privacy-policy.html",
+    "pwa.webmanifest",
     "script.js",
+    "service-worker.js",
     "styles.css",
 ]
 

@@ -21,7 +21,10 @@ INCLUDE_PATHS = [
     "favicon.png",
     "index.html",
     "manifest.json",
+    "privacy-policy.html",
+    "pwa.webmanifest",
     "script.js",
+    "service-worker.js",
     "styles.css",
 ]
 
@@ -81,6 +84,9 @@ def stage_extension(app_version):
     manifest["browser_specific_settings"] = {
         "gecko": {
             "id": "audionavigator@mkyu.one",
+            "data_collection_permissions": {
+                "required": ["none"],
+            },
             "strict_min_version": "109.0",
         },
     }
