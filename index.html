@@ -43,6 +43,7 @@
             <span data-i18n="openAudio">Open audio</span>
           </button>
         </div>
+        <div id="globalDropOverlay" class="drop-affordance is-hidden" aria-hidden="true"></div>
       </section>
 
       <section id="playerPanel" class="player-panel is-hidden" aria-label="Waveform player" data-i18n-aria="waveformPlayer">
@@ -126,6 +127,11 @@
       </section>
 
     </main>
+
+    <div id="pwaUpdateNotice" class="pwa-update-notice is-hidden" role="status" aria-live="polite" aria-hidden="true">
+      <span data-i18n="updateReady">Update ready</span>
+      <button id="pwaUpdateRestart" type="button" data-i18n="restartApp">Restart</button>
+    </div>
 
     <div id="viewportWarning" class="viewport-warning is-hidden" role="status" aria-live="polite">
       <div class="viewport-warning-card">
@@ -484,6 +490,12 @@ permissions and limitations under the License.</pre>
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
+    <script src="app/config.js"></script>
+    <script src="app/media.js"></script>
+    <script src="app/waveform-analysis.js"></script>
+    <script src="app/playback.js"></script>
+    <script src="app/settings-i18n.js"></script>
+    <script src="app/pwa-updates.js"></script>
+    <script src="app/events.js"></script>
   </body>
 </html>

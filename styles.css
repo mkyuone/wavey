@@ -31,6 +31,8 @@
   --canvas-grid: #e4e8f0;
   --canvas-silence: rgba(226, 231, 241, 0.72);
   --waveform: #526AF2;
+  --waveform-hover: #111827;
+  --waveform-hover-label-border: rgba(17, 24, 39, 0.32);
   --playhead: #181817;
   --menu-shadow: rgba(24, 24, 23, 0.14);
   --panel-shadow: rgba(24, 24, 23, 0.12);
@@ -68,6 +70,8 @@
   --canvas-grid: #2b3140;
   --canvas-silence: rgba(58, 64, 79, 0.64);
   --waveform: #8ea0ff;
+  --waveform-hover: #ffffff;
+  --waveform-hover-label-border: rgba(255, 255, 255, 0.3);
   --playhead: #f2f4f8;
   --menu-shadow: rgba(0, 0, 0, 0.38);
   --panel-shadow: rgba(0, 0, 0, 0.34);
@@ -103,6 +107,8 @@
     --canvas-grid: #2b3140;
     --canvas-silence: rgba(58, 64, 79, 0.64);
     --waveform: #8ea0ff;
+    --waveform-hover: #ffffff;
+    --waveform-hover-label-border: rgba(255, 255, 255, 0.3);
     --playhead: #f2f4f8;
     --menu-shadow: rgba(0, 0, 0, 0.38);
     --panel-shadow: rgba(0, 0, 0, 0.34);
@@ -444,11 +450,13 @@ body:has(.viewport-warning:not(.is-hidden)) {
 }
 
 .drop-zone {
+  position: relative;
   min-height: 0;
   display: grid;
   place-items: center;
   padding: 28px;
   border-style: dashed;
+  overflow: hidden;
 }
 
 .drop-zone.is-dragging {
@@ -540,6 +548,46 @@ body:has(.viewport-warning:not(.is-hidden)) {
   color: var(--ink);
   font-weight: 650;
   box-shadow: 0 8px 28px var(--panel-shadow);
+}
+
+.drop-affordance {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(61, 89, 245, 0.1);
+  pointer-events: none;
+}
+
+.pwa-update-notice {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 25;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 12px 34px var(--panel-shadow);
+  backdrop-filter: blur(var(--overlay-blur));
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
+}
+
+.pwa-update-notice button {
+  min-height: 32px;
+  padding: 0 12px;
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.9rem;
+}
+
+.pwa-update-notice button:hover {
+  background: var(--accent-strong);
 }
 
 .is-hidden {
@@ -754,8 +802,8 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .transport-row {
   display: grid;
-  grid-template-columns: auto auto auto minmax(372px, 1fr);
-  justify-content: flex-start;
+  grid-template-columns: minmax(128px, 1fr) minmax(148px, 1fr) minmax(172px, 1fr) minmax(460px, 640px);
+  justify-content: stretch;
 }
 
 .control-row button {
@@ -773,13 +821,14 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .primary-control {
-  width: var(--play-control-width, 128px);
+  width: 100%;
   border-color: var(--accent);
   background: var(--accent);
   color: var(--accent-ink);
 }
 
 #nextAudio {
+  width: 100%;
   min-width: 148px;
   white-space: nowrap;
 }
@@ -795,8 +844,10 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .jump-control {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 48px minmax(76px, 1fr) 48px;
   align-items: center;
+  width: 100%;
   height: 44px;
   gap: 0;
   padding: 0;
@@ -832,10 +883,13 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .jump-amount-wrap {
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .jump-amount-button {
-  width: 76px;
+  width: 100%;
+  min-width: 76px;
   min-height: 42px;
   height: 42px;
   display: inline-flex;
@@ -925,7 +979,7 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .slider-controls {
-  width: 100%;
+  width: min(100%, 640px);
   min-width: 0;
   display: flex;
   gap: 8px;
@@ -956,7 +1010,7 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .volume-control {
   min-width: 0;
-  flex: 1.1 1 0;
+  flex: 1 1 0;
 }
 
 .speed-control {

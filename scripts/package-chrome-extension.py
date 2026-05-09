@@ -16,6 +16,7 @@ PACKAGE_SUFFIX = "chrome"
 INCLUDE_PATHS = [
     "_locales",
     "assets",
+    "app",
     "extension",
     "favicon.ico",
     "favicon.png",
@@ -23,22 +24,21 @@ INCLUDE_PATHS = [
     "manifest.json",
     "privacy-policy.html",
     "pwa.webmanifest",
-    "script.js",
     "service-worker.js",
     "styles.css",
 ]
 
 
 def read_app_version():
-    script = (ROOT / "script.js").read_text(encoding="utf-8")
+    script = (ROOT / "app" / "config.js").read_text(encoding="utf-8")
     match = re.search(r'const\s+APP_VERSION\s*=\s*"([^"]+)"', script)
     if not match:
-        raise RuntimeError("Could not find APP_VERSION in script.js.")
+        raise RuntimeError("Could not find APP_VERSION in app/config.js.")
     return match.group(1)
 
 
 def apply_package_suffix(app_version):
-    script_path = BUILD_DIR / "script.js"
+    script_path = BUILD_DIR / "app" / "config.js"
     script = script_path.read_text(encoding="utf-8")
     script = re.sub(
         r'const\s+APP_VERSION\s*=\s*"[^"]+"',

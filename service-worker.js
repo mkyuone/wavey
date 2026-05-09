@@ -4,7 +4,13 @@ const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
-  "./script.js",
+  "./app/config.js",
+  "./app/media.js",
+  "./app/waveform-analysis.js",
+  "./app/playback.js",
+  "./app/settings-i18n.js",
+  "./app/pwa-updates.js",
+  "./app/events.js",
   "./pwa.webmanifest",
   "./favicon.ico",
   "./favicon.png",
@@ -22,8 +28,7 @@ const APP_SHELL = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(APP_CACHE)
-      .then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: "reload" }))))
-      .then(() => self.skipWaiting()),
+      .then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: "reload" })))),
   );
 });
 
@@ -57,6 +62,12 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(cacheFirst(request));
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    event.waitUntil(self.skipWaiting());
+  }
 });
 
 async function cacheFirst(request) {
@@ -93,7 +104,7 @@ async function networkFirst(request, fallbackUrl) {
 
 function isFreshnessCriticalRequest(request) {
   const { pathname } = new URL(request.url);
-  return pathname.endsWith("/script.js")
+  return pathname.includes("/app/")
     || pathname.endsWith("/styles.css")
     || pathname.endsWith("/pwa.webmanifest")
     || pathname.endsWith("/service-worker.js");
