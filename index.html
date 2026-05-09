@@ -197,9 +197,9 @@
             </div>
           </section>
 
-          <section id="transcriptionSettingsSection" class="settings-section" aria-labelledby="transcriptionSettingsTitle">
+          <section id="transcriptionSettingsSection" class="settings-section transcription-settings is-stt-pending" aria-labelledby="transcriptionSettingsTitle">
             <h2 id="transcriptionSettingsTitle" data-i18n="transcriptionSettings">Transcription</h2>
-            <div class="settings-row transcription-config-row">
+            <div class="settings-row transcription-config-row transcription-enable-row">
               <div class="settings-copy">
                 <label for="transcriptionEnabledInput" data-i18n="enableTranscription">Enable transcription</label>
               </div>
@@ -208,7 +208,7 @@
                 <span aria-hidden="true"></span>
               </label>
             </div>
-            <div class="settings-row transcription-config-row">
+            <div class="settings-row transcription-config-row transcription-language-row">
               <div class="settings-copy">
                 <p id="transcriptionLanguageLabel" data-i18n="transcriptionLanguage">Transcription language</p>
               </div>
@@ -247,10 +247,16 @@
               <p id="sttWebGpuState" class="state-pill">WebGPU not supported</p>
               <p id="sttModelState" class="state-pill">Model not downloaded</p>
             </div>
-            <div id="sttModelActions" class="stt-model-actions">
-              <button id="downloadModelButton" type="button" class="secondary-button" data-i18n="downloadModel">Download model</button>
-              <p id="sttSettingsStatus" class="settings-note is-hidden" role="status" aria-live="polite"></p>
+            <div id="sttModelActions" class="settings-row stt-model-actions">
+              <div class="settings-copy">
+                <p id="sttModelLabel" data-i18n="sttModel">Model</p>
+              </div>
+              <div class="stt-model-control">
+                <span id="sttModelStateText" class="settings-status-text">Model not downloaded</span>
+                <button id="downloadModelButton" type="button" class="secondary-button" data-i18n="downloadModel">Download model</button>
+              </div>
             </div>
+            <p id="sttSettingsStatus" class="settings-note is-hidden" role="status" aria-live="polite"></p>
             <p id="sttUnsupportedMessage" class="settings-note is-hidden" data-i18n="sttUnsupportedMessage">
               Transcription is not supported on this device/browser.
             </p>

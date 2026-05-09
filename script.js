@@ -65,6 +65,7 @@ const transcriptionLanguageMenu = document.querySelector("#transcriptionLanguage
 const transcriptionLanguageOptions = [...document.querySelectorAll("#transcriptionLanguageMenu [role='option']")];
 const sttWebGpuState = document.querySelector("#sttWebGpuState");
 const sttModelState = document.querySelector("#sttModelState");
+const sttModelStateText = document.querySelector("#sttModelStateText");
 const sttStateList = document.querySelector(".stt-state-list");
 const sttModelActions = document.querySelector("#sttModelActions");
 const downloadModelButton = document.querySelector("#downloadModelButton");
@@ -159,6 +160,7 @@ const translations = {
     transcriptionRussian: "Russian",
     transcriptionHindi: "Hindi",
     sttCapability: "Capability",
+    sttModel: "Model",
     sttWebGpuSupported: "WebGPU supported",
     sttWebGpuUnsupported: "WebGPU not supported",
     sttModelDownloaded: "Model downloaded",
@@ -826,6 +828,7 @@ const sttTranslations = {
     transcriptionRussian: "Ruso",
     transcriptionHindi: "Hindi",
     sttCapability: "Capacidad",
+    sttModel: "Modelo",
     sttWebGpuSupported: "WebGPU compatible",
     sttWebGpuUnsupported: "WebGPU no compatible",
     sttModelDownloaded: "Modelo descargado",
@@ -870,6 +873,7 @@ const sttTranslations = {
     transcriptionRussian: "Russe",
     transcriptionHindi: "Hindi",
     sttCapability: "Capacité",
+    sttModel: "Modèle",
     sttWebGpuSupported: "WebGPU pris en charge",
     sttWebGpuUnsupported: "WebGPU non pris en charge",
     sttModelDownloaded: "Modèle téléchargé",
@@ -914,6 +918,7 @@ const sttTranslations = {
     transcriptionRussian: "Russisch",
     transcriptionHindi: "Hindi",
     sttCapability: "Unterstützung",
+    sttModel: "Modell",
     sttWebGpuSupported: "WebGPU unterstützt",
     sttWebGpuUnsupported: "WebGPU nicht unterstützt",
     sttModelDownloaded: "Modell heruntergeladen",
@@ -958,6 +963,7 @@ const sttTranslations = {
     transcriptionRussian: "Russo",
     transcriptionHindi: "Hindi",
     sttCapability: "Capacidade",
+    sttModel: "Modelo",
     sttWebGpuSupported: "WebGPU compatível",
     sttWebGpuUnsupported: "WebGPU não compatível",
     sttModelDownloaded: "Modelo baixado",
@@ -1002,6 +1008,7 @@ const sttTranslations = {
     transcriptionRussian: "Русский",
     transcriptionHindi: "Хинди",
     sttCapability: "Поддержка",
+    sttModel: "Модель",
     sttWebGpuSupported: "WebGPU поддерживается",
     sttWebGpuUnsupported: "WebGPU не поддерживается",
     sttModelDownloaded: "Модель загружена",
@@ -1046,6 +1053,7 @@ const sttTranslations = {
     transcriptionRussian: "रूसी",
     transcriptionHindi: "हिन्दी",
     sttCapability: "क्षमता",
+    sttModel: "मॉडल",
     sttWebGpuSupported: "WebGPU समर्थित",
     sttWebGpuUnsupported: "WebGPU समर्थित नहीं",
     sttModelDownloaded: "मॉडल डाउनलोड हो गया",
@@ -1090,6 +1098,7 @@ const sttTranslations = {
     transcriptionRussian: "ロシア語",
     transcriptionHindi: "ヒンディー語",
     sttCapability: "対応状況",
+    sttModel: "モデル",
     sttWebGpuSupported: "WebGPU 対応",
     sttWebGpuUnsupported: "WebGPU 非対応",
     sttModelDownloaded: "モデルはダウンロード済み",
@@ -1134,6 +1143,7 @@ const sttTranslations = {
     transcriptionRussian: "러시아어",
     transcriptionHindi: "힌디어",
     sttCapability: "지원 상태",
+    sttModel: "모델",
     sttWebGpuSupported: "WebGPU 지원됨",
     sttWebGpuUnsupported: "WebGPU 지원 안 됨",
     sttModelDownloaded: "모델 다운로드됨",
@@ -1178,6 +1188,7 @@ const sttTranslations = {
     transcriptionRussian: "俄语",
     transcriptionHindi: "印地语",
     sttCapability: "支持状态",
+    sttModel: "模型",
     sttWebGpuSupported: "支持 WebGPU",
     sttWebGpuUnsupported: "不支持 WebGPU",
     sttModelDownloaded: "模型已下载",
@@ -1222,6 +1233,7 @@ const sttTranslations = {
     transcriptionRussian: "俄文",
     transcriptionHindi: "印地文",
     sttCapability: "支援狀態",
+    sttModel: "模型",
     sttWebGpuSupported: "支援 WebGPU",
     sttWebGpuUnsupported: "不支援 WebGPU",
     sttModelDownloaded: "模型已下載",
@@ -2879,6 +2891,11 @@ function syncTranscriptionUi() {
     state.settings.transcriptionEnabled = false;
   }
 
+  transcriptionSettingsSection.classList.toggle("is-stt-pending", !state.sttCapability.checked);
+  transcriptionSettingsSection.classList.toggle("is-stt-unsupported", state.sttCapability.checked && !isSupported);
+  transcriptionSettingsSection.classList.toggle("is-stt-missing-model", isSupported && !hasModel);
+  transcriptionSettingsSection.classList.toggle("is-stt-ready", isSupported && hasModel);
+
   transcriptionEnabledInput.checked = Boolean(state.settings.transcriptionEnabled && hasModel);
   transcriptionEnabledInput.disabled = !isSupported || !hasModel || state.sttIsRunning;
   transcriptionLanguageSelect.value = state.settings.transcriptionLanguage;
@@ -2892,7 +2909,7 @@ function syncTranscriptionUi() {
   configRows.forEach((row, index) => {
     row.classList.toggle("is-hidden", !isSupported || (index > 0 && !hasModel));
   });
-  sttStateList.classList.toggle("is-hidden", !isSupported);
+  sttStateList.classList.add("is-hidden");
   sttModelActions.classList.toggle("is-hidden", !isSupported || hasModel);
   downloadModelButton.disabled = !isSupported || hasModel || state.sttIsRunning;
   sttUnsupportedMessage.classList.toggle("is-hidden", isSupported);
@@ -2908,6 +2925,7 @@ function syncTranscriptionUi() {
   sttWebGpuState.classList.toggle("is-good", state.sttCapability.isSupported);
   sttModelState.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
   sttModelState.classList.toggle("is-good", state.sttModelInfo.isDownloaded);
+  sttModelStateText.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
 
   if (state.sttStatusKey) {
     transcriptStatus.textContent = translate(state.sttStatusKey, state.sttStatusParams);

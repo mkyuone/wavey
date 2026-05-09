@@ -1089,6 +1089,26 @@ output {
   border-top: 1px solid var(--line);
 }
 
+.transcription-settings {
+  gap: 12px;
+}
+
+.transcription-settings.is-stt-pending .transcription-config-row,
+.transcription-settings.is-stt-pending .stt-state-list,
+.transcription-settings.is-stt-pending .stt-model-actions,
+.transcription-settings.is-stt-pending #sttUnsupportedMessage,
+.transcription-settings.is-stt-unsupported .transcription-config-row,
+.transcription-settings.is-stt-unsupported .stt-state-list,
+.transcription-settings.is-stt-unsupported .stt-model-actions,
+.transcription-settings.is-stt-missing-model .transcription-language-row,
+.transcription-settings.is-stt-ready .stt-model-actions {
+  display: none;
+}
+
+.transcription-settings.is-stt-unsupported #sttUnsupportedMessage {
+  display: block;
+}
+
 .settings-content > .settings-section:first-child {
   padding-top: 0;
   border-top: 0;
@@ -1270,20 +1290,18 @@ output {
   color: var(--warn);
 }
 
-.stt-model-actions {
+.stt-model-control {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
 }
 
-.stt-model-actions .settings-note {
+.settings-status-text {
   color: var(--muted);
+  font-size: 0.94rem;
   font-weight: 600;
-}
-
-.stt-model-actions .settings-note.is-error {
-  color: var(--warn);
 }
 
 .settings-range {
