@@ -117,7 +117,7 @@
 
 body {
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: var(--app-height, 100dvh);
   margin: 0;
   background: var(--bg);
   color: var(--ink);
@@ -218,7 +218,7 @@ body:has(.settings-backdrop:not(.is-hidden)) {
 .app-shell {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  min-height: 100dvh;
+  min-height: var(--app-height, 100dvh);
   padding: 24px 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -554,11 +554,8 @@ canvas {
 }
 
 @media (min-height: 520px) {
-  body:has(#playerPanel:not(.is-hidden)) {
-    overflow: hidden;
-  }
-
   body:has(#playerPanel:not(.is-hidden)) .app-shell {
+    height: var(--app-height, 100dvh);
     max-height: 980px;
   }
 

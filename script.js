@@ -5,10 +5,12 @@ const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CH
 window.APP_VERSION = APP_VERSION;
 window.APP_VERSION_CHANNEL = APP_VERSION_CHANNEL;
 window.APP_VERSION_LABEL = APP_VERSION_LABEL;
+setAppHeightVariable();
 if (APP_VERSION_CHANNEL) {
   document.documentElement.dataset.buildChannel = APP_VERSION_CHANNEL;
 }
 registerPwaServiceWorker();
+const appShell = document.querySelector(".app-shell");
 const installButton = document.querySelector("#installButton");
 const settingsButton = document.querySelector("#settingsButton");
 const settingsBackdrop = document.querySelector("#settingsBackdrop");
@@ -1073,8 +1075,16 @@ waveformWrap.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 });
 
-window.addEventListener("resize", scheduleResizeCanvas);
+window.addEventListener("resize", updateAppViewport);
+window.addEventListener("orientationchange", updateAppViewport);
+window.visualViewport?.addEventListener("resize", updateAppViewport);
+window.visualViewport?.addEventListener("scroll", updateAppViewport);
 document.addEventListener("keydown", handleKeyboardControls);
+if ("ResizeObserver" in window) {
+  const layoutResizeObserver = new ResizeObserver(scheduleResizeCanvas);
+  layoutResizeObserver.observe(appShell);
+  layoutResizeObserver.observe(waveformWrap);
+}
 applyTheme();
 syncSettingsControls();
 syncAppVersion();
@@ -2648,6 +2658,15 @@ function readFileAsArrayBuffer(file, onProgress) {
 
     reader.readAsArrayBuffer(file);
   });
+}
+
+function setAppHeightVariable() {
+  document.documentElement.style.setProperty("--app-height", `${Math.round(window.innerHeight)}px`);
+}
+
+function updateAppViewport() {
+  setAppHeightVariable();
+  scheduleResizeCanvas();
 }
 
 function registerPwaServiceWorker() {
