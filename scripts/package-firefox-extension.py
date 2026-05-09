@@ -74,10 +74,13 @@ def stage_extension(app_version):
     manifest_path = BUILD_DIR / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["version"] = app_version
-    manifest["version_name"] = f"{app_version}-{PACKAGE_SUFFIX}"
+    manifest.pop("version_name", None)
+    manifest["background"] = {
+        "scripts": ["extension/background.js"],
+    }
     manifest["browser_specific_settings"] = {
         "gecko": {
-            "id": "audionavigator@markyu.dev",
+            "id": "audionavigator@mkyu.one",
             "strict_min_version": "109.0",
         },
     }
@@ -89,7 +92,7 @@ def stage_extension(app_version):
 
 
 def zip_extension(app_version):
-    zip_path = DIST_DIR / f"{ZIP_PREFIX}-{app_version}-{PACKAGE_SUFFIX}.zip"
+    zip_path = DIST_DIR / f"{ZIP_PREFIX}-{app_version}-{PACKAGE_SUFFIX}.xpi"
     if zip_path.exists():
         zip_path.unlink()
 

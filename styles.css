@@ -579,13 +579,19 @@ input[type="range"]:focus::-webkit-slider-thumb {
 input[type="range"]::-moz-range-track {
   height: 10px;
   border-radius: 999px;
-  background: var(--range-track);
+  background: linear-gradient(
+    to right,
+    var(--accent) 0,
+    var(--accent) var(--range-fill),
+    var(--range-track) var(--range-fill),
+    var(--range-track) 100%
+  );
 }
 
 input[type="range"]::-moz-range-progress {
   height: 10px;
   border-radius: 999px;
-  background: var(--accent);
+  background: transparent;
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -600,16 +606,42 @@ input[type="range"]::-moz-range-thumb {
 input[type="range"]:hover::-moz-range-track,
 input[type="range"]:active::-moz-range-track,
 input[type="range"]:focus::-moz-range-track {
-  background: var(--range-track);
+  background: linear-gradient(
+    to right,
+    var(--accent) 0,
+    var(--accent) var(--range-fill),
+    var(--range-track) var(--range-fill),
+    var(--range-track) 100%
+  );
 }
 
 input[type="range"]:hover::-moz-range-progress,
 input[type="range"]:active::-moz-range-progress,
-input[type="range"]:focus::-moz-range-progress,
+input[type="range"]:focus::-moz-range-progress {
+  background: transparent;
+}
+
 input[type="range"]:hover::-moz-range-thumb,
 input[type="range"]:active::-moz-range-thumb,
 input[type="range"]:focus::-moz-range-thumb {
   background: var(--control-thumb);
+}
+
+:root[data-build-channel="firefox"] input[type="range"] {
+  accent-color: var(--accent);
+  appearance: auto;
+  cursor: pointer;
+}
+
+:root[data-build-channel="firefox"] input[type="range"]::-moz-range-track,
+:root[data-build-channel="firefox"] input[type="range"]::-moz-range-progress,
+:root[data-build-channel="firefox"] input[type="range"]::-moz-range-thumb {
+  background: revert;
+  border: revert;
+  border-radius: revert;
+  box-shadow: revert;
+  height: revert;
+  width: revert;
 }
 
 .controls-grid {

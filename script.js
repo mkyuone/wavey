@@ -5,6 +5,9 @@ const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CH
 window.APP_VERSION = APP_VERSION;
 window.APP_VERSION_CHANNEL = APP_VERSION_CHANNEL;
 window.APP_VERSION_LABEL = APP_VERSION_LABEL;
+if (APP_VERSION_CHANNEL) {
+  document.documentElement.dataset.buildChannel = APP_VERSION_CHANNEL;
+}
 const settingsButton = document.querySelector("#settingsButton");
 const settingsBackdrop = document.querySelector("#settingsBackdrop");
 const settingsModal = document.querySelector("#settingsModal");
