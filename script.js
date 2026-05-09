@@ -1,5 +1,5 @@
 const fileInput = document.querySelector("#fileInput");
-const APP_VERSION = "1.0.3";
+const APP_VERSION = "1.0.4";
 const APP_VERSION_CHANNEL = "";
 const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CHANNEL}` : APP_VERSION;
 window.APP_VERSION = APP_VERSION;
@@ -1337,13 +1337,21 @@ async function togglePlayback() {
 }
 
 function handleKeyboardControls(event) {
-  if (event.defaultPrevented || isSettingsOpen() || shouldIgnoreShortcut(event.target) || !state.audioBuffer) {
+  if (event.defaultPrevented || isSettingsOpen() || !state.audioBuffer) {
     return;
   }
 
   if (event.code === "Space") {
+    if (shouldIgnorePlaybackShortcut(event.target)) {
+      return;
+    }
+
     event.preventDefault();
     togglePlayback();
+    return;
+  }
+
+  if (shouldIgnoreShortcut(event.target)) {
     return;
   }
 
@@ -1363,6 +1371,10 @@ function handleKeyboardControls(event) {
     event.preventDefault();
     seekToNextAudio();
   }
+}
+
+function shouldIgnorePlaybackShortcut(target) {
+  return Boolean(target?.closest("input:not([type='range']), select, textarea, [contenteditable='true']"));
 }
 
 function shouldIgnoreShortcut(target) {
@@ -2526,7 +2538,10 @@ function updateRangeFill(input) {
   const value = Number(input.value || min);
   const range = max - min;
   const percent = range > 0 ? ((value - min) / range) * 100 : 0;
-  input.style.setProperty("--range-fill", `${Math.min(100, Math.max(0, percent))}%`);
+  const boundedPercent = Math.min(100, Math.max(0, percent));
+  const thumbSize = Number.parseFloat(getComputedStyle(input).getPropertyValue("--range-thumb-size")) || 18;
+  const thumbOffset = (thumbSize / 2) - ((boundedPercent / 100) * thumbSize);
+  input.style.setProperty("--range-fill", `calc(${boundedPercent}% + ${thumbOffset.toFixed(3)}px)`);
 }
 
 function nextPaint() {
