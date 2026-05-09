@@ -103,27 +103,36 @@
                 <span class="material-symbols-sharp ui-icon" aria-hidden="true">fast_forward</span>
               </button>
             </div>
-            <div class="volume-control">
-              <label for="volumeSlider">
-                <span class="material-symbols-sharp ui-icon" aria-hidden="true">volume_up</span>
-                <span class="sr-only" data-i18n="volume">Volume</span>
+            <div class="slider-controls">
+              <div class="volume-control">
+                <label for="volumeSlider">
+                  <span class="material-symbols-sharp ui-icon" aria-hidden="true">volume_up</span>
+                  <span class="sr-only" data-i18n="volume">Volume</span>
+                </label>
+                <input id="volumeSlider" type="range" min="0" max="300" step="10" value="100" data-i18n-aria="volume">
+                <output id="volumeValue" for="volumeSlider">100%</output>
+              </div>
+              <label class="speed-control">
+                <span class="control-label">
+                  <span class="material-symbols-sharp ui-icon" aria-hidden="true">speed</span>
+                  <span class="sr-only" data-i18n="speed">Speed</span>
+                </span>
+                <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" data-i18n-aria="speed">
+                <output id="speedValue" for="speedSlider">1.00x</output>
               </label>
-              <input id="volumeSlider" type="range" min="0" max="300" step="10" value="100" data-i18n-aria="volume">
-              <output id="volumeValue" for="volumeSlider">100%</output>
             </div>
-            <label class="speed-control">
-              <span class="control-label">
-                <span class="material-symbols-sharp ui-icon" aria-hidden="true">speed</span>
-                <span class="sr-only" data-i18n="speed">Speed</span>
-              </span>
-              <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" data-i18n-aria="speed">
-              <output id="speedValue" for="speedSlider">1.00x</output>
-            </label>
           </div>
         </div>
       </section>
 
     </main>
+
+    <div id="viewportWarning" class="viewport-warning is-hidden" role="status" aria-live="polite">
+      <div class="viewport-warning-card">
+        <span class="material-symbols-sharp ui-icon" aria-hidden="true">fit_screen</span>
+        <span data-i18n="windowTooSmall">Window is too small</span>
+      </div>
+    </div>
 
     <div id="settingsBackdrop" class="settings-backdrop is-hidden" aria-hidden="true">
       <div class="modal-shell settings-dialog-shell">

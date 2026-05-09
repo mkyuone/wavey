@@ -1,4 +1,4 @@
-const CACHE_VERSION = "audionavigator-1.0.4-file-handlers";
+const CACHE_VERSION = "audionavigator-1.0.5";
 const APP_CACHE = `${CACHE_VERSION}-app-shell`;
 const APP_SHELL = [
   "./",

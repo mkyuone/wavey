@@ -35,7 +35,8 @@
   --menu-shadow: rgba(24, 24, 23, 0.14);
   --panel-shadow: rgba(24, 24, 23, 0.12);
   --thumb-shadow: rgba(24, 24, 23, 0.18);
-  --overlay-bg: rgba(255, 255, 255, 0.72);
+  --overlay-bg: rgba(255, 255, 255, 0.62);
+  --overlay-blur: 7px;
   --scrollbar-track: #e9edf4;
   --scrollbar-thumb: #9ca4b2;
   font-family:
@@ -71,7 +72,8 @@
   --menu-shadow: rgba(0, 0, 0, 0.38);
   --panel-shadow: rgba(0, 0, 0, 0.34);
   --thumb-shadow: rgba(0, 0, 0, 0.28);
-  --overlay-bg: rgba(12, 13, 16, 0.72);
+  --overlay-bg: rgba(12, 13, 16, 0.62);
+  --overlay-blur: 7px;
   --scrollbar-track: #1d212b;
   --scrollbar-thumb: #566071;
 }
@@ -105,7 +107,8 @@
     --menu-shadow: rgba(0, 0, 0, 0.38);
     --panel-shadow: rgba(0, 0, 0, 0.34);
     --thumb-shadow: rgba(0, 0, 0, 0.28);
-    --overlay-bg: rgba(12, 13, 16, 0.72);
+    --overlay-bg: rgba(12, 13, 16, 0.62);
+    --overlay-blur: 7px;
     --scrollbar-track: #1d212b;
     --scrollbar-thumb: #566071;
   }
@@ -211,15 +214,16 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-body:has(.settings-backdrop:not(.is-hidden)) {
+body:has(.settings-backdrop:not(.is-hidden)),
+body:has(.viewport-warning:not(.is-hidden)) {
   overflow: hidden;
 }
 
 .app-shell {
-  width: min(1120px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
   min-height: var(--app-height, 100dvh);
-  padding: 24px 0;
+  padding: 16px 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
 }
@@ -510,6 +514,34 @@ body:has(.settings-backdrop:not(.is-hidden)) {
   padding: 18px;
 }
 
+.viewport-warning {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(var(--overlay-blur));
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
+  pointer-events: auto;
+}
+
+.viewport-warning-card {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 650;
+  box-shadow: 0 8px 28px var(--panel-shadow);
+}
+
 .is-hidden {
   display: none;
 }
@@ -721,6 +753,8 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .transport-row {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(372px, 1fr);
   justify-content: flex-start;
 }
 
@@ -890,6 +924,13 @@ input[type="range"]:focus::-moz-range-thumb {
   border-radius: 0 9px 9px 0;
 }
 
+.slider-controls {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+}
+
 .speed-control,
 .volume-control {
   display: flex;
@@ -914,13 +955,13 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .volume-control {
-  width: 190px;
-  flex: 1 1 190px;
+  min-width: 0;
+  flex: 1.1 1 0;
 }
 
 .speed-control {
-  width: 172px;
-  flex: 1 1 172px;
+  min-width: 0;
+  flex: 1 1 0;
 }
 
 .volume-control input,
@@ -943,6 +984,22 @@ output {
   font-variant-numeric: tabular-nums;
 }
 
+@media (max-width: 1040px) {
+  .transport-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .transport-row > .primary-control,
+  .transport-row > #nextAudio,
+  .transport-row > .jump-control {
+    width: 100%;
+  }
+
+  .slider-controls {
+    grid-column: 1 / -1;
+  }
+}
+
 .settings-backdrop {
   position: fixed;
   inset: 0;
@@ -951,6 +1008,8 @@ output {
   place-items: center;
   padding: 20px;
   background: var(--overlay-bg);
+  backdrop-filter: blur(var(--overlay-blur));
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
 }
 
 .settings-backdrop.is-hidden {
@@ -1289,7 +1348,8 @@ kbd {
   display: grid;
   place-items: center;
   background: var(--overlay-bg);
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(var(--overlay-blur));
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
 }
 
 .loading-overlay.is-hidden {
@@ -1355,8 +1415,8 @@ kbd {
 
 @media (max-width: 760px) {
   .app-shell {
-    width: min(100% - 20px, 1120px);
-    padding: 14px 0;
+    width: min(100% - 20px, 1440px);
+    padding: 10px 0;
   }
 
   .app-header,
@@ -1373,8 +1433,7 @@ kbd {
 
   .file-button,
   .install-button,
-  .speed-control,
-  .volume-control {
+  .slider-controls {
     width: 100%;
     flex: 1 1 100%;
   }
@@ -1425,7 +1484,9 @@ kbd {
 
   .jump-control {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 48px 76px 48px;
+    justify-content: center;
+    justify-items: center;
     width: 100%;
   }
 
@@ -1434,7 +1495,7 @@ kbd {
   }
 
   .jump-control > .icon-button {
-    width: 100%;
+    width: 48px;
   }
 
   .settings-backdrop {
