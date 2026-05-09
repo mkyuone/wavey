@@ -11,7 +11,13 @@
     "service_worker": "extension/background.js"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self';"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; object-src 'self'; font-src 'self'; connect-src https://sf.mkyu.one;"
+  },
+  "cross_origin_embedder_policy": {
+    "value": "require-corp"
+  },
+  "cross_origin_opener_policy": {
+    "value": "same-origin"
   },
   "icons": {
     "16": "assets/icons/icon-16.png",

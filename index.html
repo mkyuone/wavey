@@ -67,6 +67,18 @@
               <span class="material-symbols-sharp ui-icon" aria-hidden="true">skip_next</span>
               <span data-i18n="nextSound">Next section</span>
             </button>
+            <button id="transcribeButton" type="button" class="icon-button stt-control is-hidden" aria-label="Transcribe" data-i18n-aria="transcribe">
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">graphic_eq</span>
+              <span data-i18n="transcribe">Transcribe</span>
+            </button>
+            <button id="transcriptButton" type="button" class="icon-button stt-control is-hidden" aria-label="Transcript" data-i18n-aria="transcript">
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">article</span>
+              <span data-i18n="transcript">Transcript</span>
+            </button>
+            <button id="subtitleButton" type="button" class="icon-button stt-control is-hidden" aria-label="Subtitles" data-i18n-aria="subtitles">
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">closed_caption</span>
+              <span data-i18n="subtitles">Subtitles</span>
+            </button>
             <div class="jump-control" aria-label="Timed jump controls" data-i18n-aria="timedJumpControls">
               <button id="jumpBack" type="button" class="icon-button" aria-label="Jump backward" data-i18n-aria="jumpBackward">
                 <span class="material-symbols-sharp ui-icon" aria-hidden="true">fast_rewind</span>
@@ -113,6 +125,7 @@
               <output id="speedValue" for="speedSlider">1.00x</output>
             </label>
           </div>
+          <p id="transcriptStatus" class="transcript-status is-hidden" role="status" aria-live="polite"></p>
         </div>
       </section>
 
@@ -182,6 +195,65 @@
                 </label>
               </fieldset>
             </div>
+          </section>
+
+          <section id="transcriptionSettingsSection" class="settings-section" aria-labelledby="transcriptionSettingsTitle">
+            <h2 id="transcriptionSettingsTitle" data-i18n="transcriptionSettings">Transcription</h2>
+            <div class="settings-row transcription-config-row">
+              <div class="settings-copy">
+                <label for="transcriptionEnabledInput" data-i18n="enableTranscription">Enable transcription</label>
+              </div>
+              <label class="switch-control">
+                <input id="transcriptionEnabledInput" type="checkbox">
+                <span aria-hidden="true"></span>
+              </label>
+            </div>
+            <div class="settings-row transcription-config-row">
+              <div class="settings-copy">
+                <p id="transcriptionLanguageLabel" data-i18n="transcriptionLanguage">Transcription language</p>
+              </div>
+              <div id="transcriptionLanguageControl" class="language-control transcription-language-control" aria-labelledby="transcriptionLanguageLabel">
+                <span class="material-symbols-sharp ui-icon" aria-hidden="true">translate</span>
+                <button
+                  id="transcriptionLanguageSelect"
+                  type="button"
+                  class="language-button"
+                  value="auto"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="transcriptionLanguageMenu"
+                  aria-label="Transcription language"
+                  data-i18n-aria="transcriptionLanguage"
+                >
+                  <span class="transcription-language-value">Auto</span>
+                  <span class="material-symbols-sharp ui-icon" aria-hidden="true">expand_more</span>
+                </button>
+                <div id="transcriptionLanguageMenu" class="custom-menu language-menu is-hidden" role="listbox" aria-label="Transcription language" data-i18n-aria="transcriptionLanguage">
+                  <button type="button" role="option" data-value="auto" data-i18n="transcriptionAuto" aria-selected="true">Auto</button>
+                  <button type="button" role="option" data-value="en" data-i18n="transcriptionEnglish">English</button>
+                  <button type="button" role="option" data-value="zh" data-i18n="transcriptionChinese">Chinese</button>
+                  <button type="button" role="option" data-value="ja" data-i18n="transcriptionJapanese">Japanese</button>
+                  <button type="button" role="option" data-value="ko" data-i18n="transcriptionKorean">Korean</button>
+                  <button type="button" role="option" data-value="es" data-i18n="transcriptionSpanish">Spanish</button>
+                  <button type="button" role="option" data-value="fr" data-i18n="transcriptionFrench">French</button>
+                  <button type="button" role="option" data-value="de" data-i18n="transcriptionGerman">German</button>
+                  <button type="button" role="option" data-value="pt" data-i18n="transcriptionPortuguese">Portuguese</button>
+                  <button type="button" role="option" data-value="ru" data-i18n="transcriptionRussian">Russian</button>
+                  <button type="button" role="option" data-value="hi" data-i18n="transcriptionHindi">Hindi</button>
+                </div>
+              </div>
+            </div>
+            <div class="stt-state-list" aria-label="Capability" data-i18n-aria="sttCapability">
+              <p id="sttWebGpuState" class="state-pill">WebGPU not supported</p>
+              <p id="sttModelState" class="state-pill">Model not downloaded</p>
+            </div>
+            <div id="sttModelActions" class="stt-model-actions">
+              <button id="downloadModelButton" type="button" class="secondary-button" data-i18n="downloadModel">Download model</button>
+              <p id="sttSettingsStatus" class="settings-note is-hidden" role="status" aria-live="polite"></p>
+            </div>
+            <p id="sttUnsupportedMessage" class="settings-note is-hidden" data-i18n="sttUnsupportedMessage">
+              Transcription is not supported on this device/browser.
+            </p>
           </section>
 
           <section class="settings-section" aria-labelledby="detectionSettingsTitle">
@@ -254,6 +326,28 @@
         </div>
       </section>
     </div>
+
+    <div id="transcriptBackdrop" class="settings-backdrop transcript-backdrop is-hidden" aria-hidden="true">
+      <section id="transcriptModal" class="transcript-modal" role="dialog" aria-modal="true" aria-label="Transcript" data-i18n-aria="transcript">
+        <button id="transcriptClose" type="button" class="settings-close icon-button" aria-label="Close transcript" data-i18n-aria="closeTranscript">
+          <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
+        </button>
+        <div class="transcript-content">
+          <h2 data-i18n="transcript">Transcript</h2>
+          <div id="transcriptList" class="transcript-list" role="list"></div>
+        </div>
+      </section>
+    </div>
+
+    <section id="subtitleWindow" class="subtitle-window is-hidden" aria-label="Subtitles" data-i18n-aria="subtitles">
+      <div id="subtitleDragHandle" class="subtitle-drag-handle">
+        <span class="material-symbols-sharp ui-icon" aria-hidden="true">closed_caption</span>
+        <button id="subtitleClose" type="button" class="icon-button" aria-label="Close subtitles" data-i18n-aria="closeSubtitles">
+          <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
+        </button>
+      </div>
+      <p id="subtitleText" data-i18n="subtitlePlaceholder">Subtitles will appear during playback.</p>
+    </section>
 
     <div id="licenseBackdrop" class="settings-backdrop license-backdrop is-hidden" aria-hidden="true">
       <section class="license-modal" role="dialog" aria-modal="true" aria-labelledby="licenseTitle">
@@ -451,6 +545,31 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.</pre>
+          </section>
+          <section class="license-section" aria-labelledby="whisperLicenseTitle">
+            <h3 id="whisperLicenseTitle">whisper.cpp</h3>
+            <p>Bundled Whisper runtime files are from whisper.cpp and licensed under the MIT License.</p>
+            <pre>MIT License
+
+Copyright (c) Georgi Gerganov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
           </section>
         </div>
       </section>
