@@ -60,7 +60,6 @@ const loadingProgressTrack = document.querySelector(".progress-track");
 const themeColorMeta = document.querySelector("meta[name='theme-color']");
 const colorSchemeQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
 const themeOptions = [...document.querySelectorAll("input[name='themeMode']")];
-const showInstallButtonInput = document.querySelector("#showInstallButtonInput");
 const silenceThresholdInput = document.querySelector("#silenceThresholdInput");
 const silenceThresholdValue = document.querySelector("#silenceThresholdValue");
 const minSilenceInput = document.querySelector("#minSilenceInput");
@@ -97,7 +96,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols fonts are provided by Google and licensed under the Apache License, Version 2.0.",
     installApp: "Install app",
-    showInstallButton: "Show install button",
     updateReady: "Update ready",
     restartApp: "Restart",
     windowTooSmall: "Window is too small",
@@ -167,7 +165,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Las fuentes Material Symbols son proporcionadas por Google y están bajo la licencia Apache, versión 2.0.",
     installApp: "Instalar app",
-    showInstallButton: "Mostrar botón de instalación",
     updateReady: "Actualización lista",
     restartApp: "Reiniciar",
     windowTooSmall: "La ventana es demasiado pequeña",
@@ -237,7 +234,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Les polices Material Symbols sont fournies par Google et sous licence Apache, version 2.0.",
     installApp: "Installer l'app",
-    showInstallButton: "Afficher le bouton d’installation",
     updateReady: "Mise à jour prête",
     restartApp: "Redémarrer",
     windowTooSmall: "La fenêtre est trop petite",
@@ -307,7 +303,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols-Schriften werden von Google bereitgestellt und unter der Apache-Lizenz, Version 2.0, lizenziert.",
     installApp: "App installieren",
-    showInstallButton: "Installieren-Schaltfläche anzeigen",
     updateReady: "Update bereit",
     restartApp: "Neu starten",
     windowTooSmall: "Fenster ist zu klein",
@@ -377,7 +372,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "As fontes Material Symbols são fornecidas pelo Google e licenciadas sob a Licença Apache, versão 2.0.",
     installApp: "Instalar app",
-    showInstallButton: "Mostrar botão de instalação",
     updateReady: "Atualização pronta",
     restartApp: "Reiniciar",
     windowTooSmall: "A janela é muito pequena",
@@ -447,7 +441,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Шрифты Material Symbols предоставляются Google и лицензируются по лицензии Apache версии 2.0.",
     installApp: "Установить",
-    showInstallButton: "Показывать кнопку установки",
     updateReady: "Обновление готово",
     restartApp: "Перезапустить",
     windowTooSmall: "Окно слишком маленькое",
@@ -517,7 +510,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols फ़ॉन्ट Google द्वारा प्रदान किए जाते हैं और Apache License, Version 2.0 के तहत लाइसेंस प्राप्त हैं।",
     installApp: "ऐप इंस्टॉल करें",
-    showInstallButton: "इंस्टॉल बटन दिखाएँ",
     updateReady: "अपडेट तैयार है",
     restartApp: "रीस्टार्ट करें",
     windowTooSmall: "विंडो बहुत छोटी है",
@@ -587,7 +579,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols フォントは Google により提供され、Apache License, Version 2.0 のもとでライセンスされています。",
     installApp: "アプリをインストール",
-    showInstallButton: "インストールボタンを表示",
     updateReady: "更新の準備ができました",
     restartApp: "再起動",
     windowTooSmall: "ウィンドウが小さすぎます",
@@ -657,7 +648,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 글꼴은 Google에서 제공하며 Apache License, Version 2.0에 따라 라이선스됩니다.",
     installApp: "앱 설치",
-    showInstallButton: "설치 버튼 표시",
     updateReady: "업데이트 준비됨",
     restartApp: "다시 시작",
     windowTooSmall: "창이 너무 작습니다",
@@ -727,7 +717,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 字体由 Google 提供，并根据 Apache License, Version 2.0 授权。",
     installApp: "安装应用",
-    showInstallButton: "显示安装按钮",
     updateReady: "更新已就绪",
     restartApp: "重启",
     windowTooSmall: "窗口太小",
@@ -797,7 +786,6 @@ const translations = {
     materialSymbolsLicense: "Material Symbols",
     materialSymbolsLicenseSummary: "Material Symbols 字型由 Google 提供，並依 Apache License, Version 2.0 授權。",
     installApp: "安裝 App",
-    showInstallButton: "顯示安裝按鈕",
     updateReady: "更新已就緒",
     restartApp: "重新啟動",
     windowTooSmall: "視窗太小",
@@ -845,7 +833,6 @@ const STORAGE_KEY = "audioNavigatorSettings";
 const WAVEFORM_HINT_STORAGE_KEY = `audioNavigatorWaveformHint:${APP_VERSION}`;
 const DEFAULT_SETTINGS = {
   theme: "auto",
-  showInstallButton: true,
   silenceThreshold: 0.01,
   minSilenceSeconds: 12,
   minAudibleSeconds: 0.2,
@@ -900,13 +887,9 @@ function normalizeStoredSettings(storedSettings, defaultLanguage) {
 
   const language = translations[stored.language] ? stored.language : fallback.language;
   const theme = ["auto", "dark", "light"].includes(stored.theme) ? stored.theme : fallback.theme;
-  const showInstallButton = typeof stored.showInstallButton === "boolean"
-    ? stored.showInstallButton
-    : fallback.showInstallButton;
   return {
     language,
     theme,
-    showInstallButton,
     silenceThreshold: clampNumber(Number(stored.silenceThreshold ?? fallback.silenceThreshold), 0.005, 0.08),
     minSilenceSeconds: clampNumber(Number(stored.minSilenceSeconds ?? fallback.minSilenceSeconds), 1, 30),
     minAudibleSeconds: clampNumber(Number(stored.minAudibleSeconds ?? fallback.minAudibleSeconds), 0.1, 3),
@@ -945,7 +928,6 @@ const state = {
   hasSupportedBrowserLanguage: languagePreference.isSupported,
   settings: {
     theme: savedSettings.theme,
-    showInstallButton: savedSettings.showInstallButton,
     silenceThreshold: savedSettings.silenceThreshold,
     minSilenceSeconds: savedSettings.minSilenceSeconds,
     minAudibleSeconds: savedSettings.minAudibleSeconds,

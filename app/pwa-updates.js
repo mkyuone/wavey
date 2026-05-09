@@ -75,7 +75,18 @@ function isPwaInstallContext() {
   const isHttpApp = window.location.protocol === "https:"
     || window.location.hostname === "localhost"
     || window.location.hostname === "127.0.0.1";
-  return isHttpApp && !isInstalledPwaContext();
+  return isHttpApp && isChromiumBrowser() && !isInstalledPwaContext();
+}
+
+function isChromiumBrowser() {
+  const brands = navigator.userAgentData?.brands || [];
+  if (brands.length) {
+    return brands.some((brand) => /Chromium|Google Chrome|Microsoft Edge/i.test(brand.brand));
+  }
+
+  const userAgent = navigator.userAgent;
+  return /\b(Chrome|Chromium|Edg|OPR)\//.test(userAgent)
+    && !/\b(Firefox|FxiOS)\b/.test(userAgent);
 }
 
 function isInstalledPwaContext() {
@@ -91,7 +102,7 @@ function syncInstallButton() {
 
   installButton.classList.toggle(
     "is-hidden",
-    !state.settings.showInstallButton || !state.deferredInstallPrompt || !isPwaInstallContext(),
+    !state.deferredInstallPrompt || !isPwaInstallContext(),
   );
 }
 

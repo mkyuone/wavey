@@ -82,12 +82,10 @@ function applyTheme() {
 
 function syncSettingsControls() {
   syncThemeControls();
-  showInstallButtonInput.checked = Boolean(state.settings.showInstallButton);
   silenceThresholdInput.value = String(state.settings.silenceThreshold);
   minSilenceInput.value = String(state.settings.minSilenceSeconds);
   minAudibleInput.value = String(state.settings.minAudibleSeconds);
   updateSettingsOutputs();
-  syncInstallButton();
 }
 
 function syncAppVersion() {
@@ -109,12 +107,6 @@ function updateDetectionSetting() {
   updateSettingsOutputs();
   persistSettings();
   reanalyzeSilenceSettings();
-}
-
-function updateInstallButtonSetting() {
-  state.settings.showInstallButton = showInstallButtonInput.checked;
-  persistSettings();
-  syncInstallButton();
 }
 
 function updateSettingsOutputs() {
@@ -260,7 +252,6 @@ function getSettingsPayload() {
   return {
     language: state.language,
     theme: state.settings.theme,
-    showInstallButton: state.settings.showInstallButton,
     silenceThreshold: state.settings.silenceThreshold,
     minSilenceSeconds: state.settings.minSilenceSeconds,
     minAudibleSeconds: state.settings.minAudibleSeconds,
@@ -330,7 +321,6 @@ function applySavedSettings(settings) {
   state.language = settings.language;
   state.settings = {
     theme: settings.theme,
-    showInstallButton: settings.showInstallButton,
     silenceThreshold: settings.silenceThreshold,
     minSilenceSeconds: settings.minSilenceSeconds,
     minAudibleSeconds: settings.minAudibleSeconds,

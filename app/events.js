@@ -34,8 +34,6 @@ themeOptions.forEach((option) => {
   input.addEventListener("input", updateDetectionSetting);
 });
 
-showInstallButtonInput.addEventListener("change", updateInstallButtonSetting);
-
 resetSettings.addEventListener("click", resetDefaultSettings);
 
 languageControl.addEventListener("click", (event) => {

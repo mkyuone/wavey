@@ -635,7 +635,7 @@ canvas {
 
 .waveform-seek-hint {
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   left: 50%;
   z-index: 2;
   min-height: 34px;
@@ -650,10 +650,14 @@ canvas {
   background: var(--surface);
   color: var(--ink);
   font-size: 0.9rem;
-  font-weight: 650;
+  font-weight: 400;
   box-shadow: 0 8px 24px var(--panel-shadow);
   pointer-events: none;
   transform: translateX(-50%);
+}
+
+.waveform-seek-hint.is-hidden {
+  display: none;
 }
 
 .waveform-seek-hint .ui-icon {
@@ -829,7 +833,7 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .transport-row {
   display: grid;
-  grid-template-columns: minmax(128px, 1fr) minmax(148px, 1fr) minmax(172px, 1fr) minmax(460px, 640px);
+  grid-template-columns: minmax(128px, 1fr) minmax(148px, 1fr) minmax(188px, 1fr) minmax(460px, 640px);
   justify-content: stretch;
 }
 
@@ -875,12 +879,14 @@ input[type="range"]:focus::-moz-range-thumb {
   grid-template-columns: 48px minmax(76px, 1fr) 48px;
   align-items: center;
   width: 100%;
+  min-width: 188px;
   height: 44px;
   gap: 0;
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
+  overflow: hidden;
 }
 
 .jump-control button {
@@ -1067,7 +1073,7 @@ output {
 
 @media (max-width: 1040px) {
   .transport-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(128px, 1fr) minmax(148px, 1fr) minmax(188px, 1fr);
   }
 
   .transport-row > .primary-control,
@@ -1318,61 +1324,6 @@ output {
 .segmented-control input:focus-visible + span {
   outline: 3px solid rgba(61, 89, 245, 0.25);
   outline-offset: 1px;
-}
-
-.settings-switch {
-  justify-self: end;
-  position: relative;
-  width: 58px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.settings-switch input {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-}
-
-.settings-switch span {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface-soft);
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.settings-switch span::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--control-thumb);
-  box-shadow: 0 1px 4px var(--thumb-shadow);
-  transition: transform 160ms ease;
-}
-
-.settings-switch input:checked + span {
-  border-color: var(--accent);
-  background: var(--accent);
-}
-
-.settings-switch input:checked + span::after {
-  transform: translateX(24px);
-}
-
-.settings-switch input:focus-visible + span {
-  outline: 3px solid rgba(61, 89, 245, 0.25);
-  outline-offset: 2px;
 }
 
 .settings-range {
