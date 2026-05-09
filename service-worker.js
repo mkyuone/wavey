@@ -1,4 +1,4 @@
-const CACHE_VERSION = "audionavigator-1.1.0";
+const CACHE_VERSION = "wavey-audio-navigator-1.1.0";
 const APP_CACHE = `${CACHE_VERSION}-app-shell`;
 const APP_SHELL = [
   "./",
@@ -37,7 +37,9 @@ self.addEventListener("activate", (event) => {
     caches.keys()
       .then((keys) => Promise.all(
         keys
-          .filter((key) => key.startsWith("audionavigator-") && key !== APP_CACHE)
+          .filter((key) => (
+            key.startsWith("audionavigator-") || key.startsWith("wavey-audio-navigator-")
+          ) && key !== APP_CACHE)
           .map((key) => caches.delete(key)),
       ))
       .then(() => self.clients.claim()),

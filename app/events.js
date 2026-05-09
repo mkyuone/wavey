@@ -1,4 +1,4 @@
-// AudioNavigator event wiring and startup.
+// Wavey Audio Navigator event wiring and startup.
 setAppHeightVariable();
 if (APP_VERSION_CHANNEL) {
   document.documentElement.dataset.buildChannel = APP_VERSION_CHANNEL;
@@ -245,7 +245,7 @@ applyLanguage();
 hydratePersistentSettings().catch(() => {
   state.settingsStorageHydrated = true;
 });
-Object.assign(window.AudioNavigator, {
+Object.assign(window.WaveyNavigator, {
   state,
   loadFile,
   setLanguage,

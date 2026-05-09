@@ -1,4 +1,4 @@
-// AudioNavigator waveform rendering and silence analysis.
+// Wavey Audio Navigator waveform rendering and silence analysis.
 async function buildPeaks(onProgress = () => {}) {
   const buffer = state.audioBuffer;
   const channelData = collectMonoSamples(buffer);

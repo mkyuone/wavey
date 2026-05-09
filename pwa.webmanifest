@@ -1,6 +1,6 @@
 {
-  "name": "AudioNavigator",
-  "short_name": "AudioNavigator",
+  "name": "Wavey Audio Navigator",
+  "short_name": "Wavey",
   "description": "Review local audio faster with a clear waveform and quick jumps between audible sections and quiet gaps.",
   "id": "./",
   "start_url": "./",

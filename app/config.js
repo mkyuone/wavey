@@ -1,9 +1,9 @@
-// AudioNavigator configuration, DOM references, state, and i18n.
+// Wavey Audio Navigator configuration, DOM references, state, and i18n.
 const fileInput = document.querySelector("#fileInput");
 const APP_VERSION = "1.1.0";
 const APP_VERSION_CHANNEL = "";
 const APP_VERSION_LABEL = APP_VERSION_CHANNEL ? `${APP_VERSION}-${APP_VERSION_CHANNEL}` : APP_VERSION;
-window.AudioNavigator = window.AudioNavigator || {};
+window.WaveyNavigator = window.WaveyNavigator || {};
 window.APP_VERSION = APP_VERSION;
 window.APP_VERSION_CHANNEL = APP_VERSION_CHANNEL;
 window.APP_VERSION_LABEL = APP_VERSION_LABEL;

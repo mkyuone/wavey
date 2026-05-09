@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = ROOT / "dist"
 BUILD_DIR = DIST_DIR / "firefox-extension"
-ZIP_PREFIX = "audionavigator"
+ZIP_PREFIX = "wavey-audio-navigator"
 PACKAGE_SUFFIX = "firefox"
 
 INCLUDE_PATHS = [

@@ -1,4 +1,4 @@
-// AudioNavigator media loading and browser decoding helpers.
+// Wavey Audio Navigator media loading and browser decoding helpers.
 async function loadFile(file) {
   setStatus("readingAudio");
   setBusy(true, "processingAudio", "readingFile", {}, 0);

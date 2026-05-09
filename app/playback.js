@@ -1,4 +1,4 @@
-// AudioNavigator playback, seeking, and transport controls.
+// Wavey Audio Navigator playback, seeking, and transport controls.
 function seekToNextAudio() {
   const current = getCurrentTime();
   const currentRegion = state.regions.find((item) => item.start <= current && item.end >= current);

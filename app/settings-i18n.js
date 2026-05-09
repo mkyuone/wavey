@@ -1,4 +1,4 @@
-// AudioNavigator settings, localization, and general UI helpers.
+// Wavey Audio Navigator settings, localization, and general UI helpers.
 function setLanguage(language, shouldApply = true) {
   const fallbackLanguage = translations[language] ? language : "en";
   const selectedOption = languageOptions.find((option) => option.dataset.value === fallbackLanguage);

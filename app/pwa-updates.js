@@ -1,4 +1,4 @@
-// AudioNavigator PWA install and update helpers.
+// Wavey Audio Navigator PWA install and update helpers.
 function registerPwaServiceWorker() {
   const canRegister = "serviceWorker" in navigator
     && (window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
@@ -12,11 +12,11 @@ function registerPwaServiceWorker() {
       .then((registration) => {
         watchPwaUpdates(registration);
         registration.update().catch((error) => {
-          console.warn("Could not check for an AudioNavigator service worker update.", error);
+          console.warn("Could not check for a Wavey Audio Navigator service worker update.", error);
         });
       })
       .catch((error) => {
-        console.warn("Could not register AudioNavigator service worker.", error);
+        console.warn("Could not register Wavey Audio Navigator service worker.", error);
       });
   });
 
@@ -120,6 +120,6 @@ async function promptPwaInstall() {
   try {
     await installPrompt.userChoice;
   } catch (error) {
-    console.warn("AudioNavigator install prompt was dismissed before a choice was returned.", error);
+    console.warn("Wavey Audio Navigator install prompt was dismissed before a choice was returned.", error);
   }
 }

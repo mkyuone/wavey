@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "AudioNavigator"
+    "message": "Wavey Audio Navigator"
   },
   "extDescription": {
     "message": "通过可视化波形和声音/静音段快速跳转，更快检查音频。文件只在浏览器本地处理。"
