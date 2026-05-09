@@ -1019,6 +1019,10 @@ window.addEventListener("appinstalled", () => {
 });
 window.addEventListener("pageshow", syncInstallButton);
 
+if ("launchQueue" in window) {
+  window.launchQueue.setConsumer(handlePwaLaunchFiles);
+}
+
 speedSlider.addEventListener("input", updatePlaybackSpeed);
 
 volumeSlider.addEventListener("input", updateOutputGain);
@@ -1140,6 +1144,23 @@ async function loadFile(file) {
     setError(error instanceof UnsupportedMediaError ? "unsupportedFile" : "decodeError");
     setBusy(false);
     fileInput.value = "";
+  }
+}
+
+async function handlePwaLaunchFiles(launchParams) {
+  const [fileHandle] = launchParams.files || [];
+  if (!fileHandle?.getFile) {
+    setStatus("chooseAudioFile");
+    return;
+  }
+
+  try {
+    const file = await fileHandle.getFile();
+    await loadFile(file);
+  } catch (error) {
+    console.error(error);
+    setError("decodeError");
+    setBusy(false);
   }
 }
 
@@ -2638,9 +2659,11 @@ function registerPwaServiceWorker() {
   }
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
-      console.warn("Could not register AudioNavigator service worker.", error);
-    });
+    navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" })
+      .then((registration) => registration.update())
+      .catch((error) => {
+        console.warn("Could not register AudioNavigator service worker.", error);
+      });
   });
 }
 

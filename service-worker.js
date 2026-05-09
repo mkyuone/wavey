@@ -1,4 +1,4 @@
-const CACHE_VERSION = "audionavigator-1.0.4";
+const CACHE_VERSION = "audionavigator-1.0.4-file-handlers";
 const APP_CACHE = `${CACHE_VERSION}-app-shell`;
 const APP_SHELL = [
   "./",
@@ -22,7 +22,7 @@ const APP_SHELL = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(APP_CACHE)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: "reload" }))))
       .then(() => self.skipWaiting()),
   );
 });
@@ -60,6 +60,10 @@ self.addEventListener("fetch", (event) => {
 });
 
 async function cacheFirst(request) {
+  if (isFreshnessCriticalRequest(request)) {
+    return networkFirst(request, request.url);
+  }
+
   const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) {
     return cached;
@@ -85,4 +89,12 @@ async function networkFirst(request, fallbackUrl) {
     const cached = await caches.match(request, { ignoreSearch: true });
     return cached || caches.match(fallbackUrl);
   }
+}
+
+function isFreshnessCriticalRequest(request) {
+  const { pathname } = new URL(request.url);
+  return pathname.endsWith("/script.js")
+    || pathname.endsWith("/styles.css")
+    || pathname.endsWith("/pwa.webmanifest")
+    || pathname.endsWith("/service-worker.js");
 }

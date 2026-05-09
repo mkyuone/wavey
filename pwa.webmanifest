@@ -8,6 +8,27 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3D59F5",
+  "file_handlers": [
+    {
+      "action": "./",
+      "launch_type": "single-client",
+      "accept": {
+        "audio/aac": [".aac"],
+        "audio/flac": [".flac"],
+        "audio/mp4": [".m4a"],
+        "audio/mpeg": [".mp3"],
+        "audio/ogg": [".oga", ".ogg", ".opus"],
+        "audio/wav": [".wav"],
+        "audio/webm": [".weba"],
+        "audio/x-wav": [".wav"],
+        "video/mp4": [".m4v", ".mp4"],
+        "video/quicktime": [".mov"],
+        "video/webm": [".webm"],
+        "video/x-matroska": [".mkv"],
+        "video/x-msvideo": [".avi"]
+      }
+    }
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-192.png",
