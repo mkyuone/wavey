@@ -218,7 +218,10 @@ body:has(.settings-backdrop:not(.is-hidden)) {
 .app-shell {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 32px 0;
+  min-height: 100dvh;
+  padding: 24px 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .app-header {
@@ -437,10 +440,10 @@ body:has(.settings-backdrop:not(.is-hidden)) {
 }
 
 .drop-zone {
-  min-height: 58vh;
+  min-height: 0;
   display: grid;
   place-items: center;
-  padding: clamp(40px, 8vh, 72px) 28px;
+  padding: 28px;
   border-style: dashed;
 }
 
@@ -556,10 +559,7 @@ canvas {
   }
 
   body:has(#playerPanel:not(.is-hidden)) .app-shell {
-    height: 100dvh;
     max-height: 980px;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
   }
 
   #playerPanel:not(.is-hidden) {
@@ -1359,7 +1359,7 @@ kbd {
 @media (max-width: 760px) {
   .app-shell {
     width: min(100% - 20px, 1120px);
-    padding: 18px 0;
+    padding: 14px 0;
   }
 
   .app-header,
@@ -1397,8 +1397,7 @@ kbd {
   }
 
   .drop-zone {
-    min-height: 48vh;
-    padding: 24px;
+    padding: 20px;
   }
 
   .drop-copy strong {
