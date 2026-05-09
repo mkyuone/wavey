@@ -10,6 +10,9 @@
   "background": {
     "service_worker": "extension/background.js"
   },
+  "permissions": [
+    "storage"
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self';"
   },

@@ -119,11 +119,8 @@
     </main>
 
     <div id="settingsBackdrop" class="settings-backdrop is-hidden" aria-hidden="true">
+      <div class="modal-shell settings-dialog-shell">
       <section id="settingsModal" class="settings-modal" role="dialog" aria-modal="true" aria-label="Settings" data-i18n-aria="settings">
-        <button id="settingsClose" type="button" class="settings-close icon-button" aria-label="Close settings" data-i18n-aria="closeSettings">
-          <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
-        </button>
-
         <div class="settings-content">
           <section class="settings-section" aria-labelledby="displaySettingsTitle">
             <h2 id="displaySettingsTitle" data-i18n="displaySettings">Display</h2>
@@ -253,13 +250,15 @@
           </div>
         </div>
       </section>
+      <button id="settingsClose" type="button" class="settings-close icon-button" aria-label="Close settings" data-i18n-aria="closeSettings">
+        <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
+      </button>
+      </div>
     </div>
 
     <div id="licenseBackdrop" class="settings-backdrop license-backdrop is-hidden" aria-hidden="true">
+      <div class="modal-shell license-dialog-shell">
       <section class="license-modal" role="dialog" aria-modal="true" aria-labelledby="licenseTitle">
-        <button id="licenseClose" type="button" class="settings-close icon-button" aria-label="Close licenses" data-i18n-aria="closeLicenses">
-          <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
-        </button>
         <div class="license-content">
           <h2 id="licenseTitle" data-i18n="openSourceLicenses">Open source licenses</h2>
           <section class="license-section" aria-labelledby="materialSymbolsLicenseTitle">
@@ -454,6 +453,10 @@ permissions and limitations under the License.</pre>
           </section>
         </div>
       </section>
+      <button id="licenseClose" type="button" class="settings-close icon-button" aria-label="Close licenses" data-i18n-aria="closeLicenses">
+        <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
+      </button>
+      </div>
     </div>
 
     <div id="loadingOverlay" class="loading-overlay is-hidden" role="status" aria-live="polite" aria-busy="true">

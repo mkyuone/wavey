@@ -761,6 +761,8 @@ const state = {
     minSilenceSeconds: savedSettings.minSilenceSeconds,
     minAudibleSeconds: savedSettings.minAudibleSeconds,
   },
+  settingsStorageHydrated: false,
+  settingsChangedBeforeHydration: false,
   audioBuffer: null,
   mediaDuration: 0,
   monoSamples: null,
@@ -1035,6 +1037,9 @@ syncSettingsControls();
 syncAppVersion();
 setLanguage(state.language, false);
 applyLanguage();
+hydratePersistentSettings().catch(() => {
+  state.settingsStorageHydrated = true;
+});
 
 async function loadFile(file) {
   setStatus("readingAudio");
@@ -2179,43 +2184,164 @@ function getSupportedLanguage(language, supportedLanguages) {
   return supportedLanguages.find((item) => item === baseLanguage || item.startsWith(`${baseLanguage}-`)) || "";
 }
 
-function getSavedSettings(defaultLanguage) {
+function normalizeStoredSettings(storedSettings, defaultLanguage) {
+  const stored = parseStoredSettings(storedSettings);
   const fallback = {
     ...DEFAULT_SETTINGS,
     language: defaultLanguage,
   };
 
+  const language = translations[stored.language] ? stored.language : fallback.language;
+  const theme = ["auto", "dark", "light"].includes(stored.theme) ? stored.theme : fallback.theme;
+  return {
+    language,
+    theme,
+    silenceThreshold: clampNumber(Number(stored.silenceThreshold ?? fallback.silenceThreshold), 0.005, 0.08),
+    minSilenceSeconds: clampNumber(Number(stored.minSilenceSeconds ?? fallback.minSilenceSeconds), 1, 30),
+    minAudibleSeconds: clampNumber(Number(stored.minAudibleSeconds ?? fallback.minAudibleSeconds), 0.1, 3),
+  };
+}
+
+function parseStoredSettings(storedSettings) {
+  if (!storedSettings) {
+    return {};
+  }
+
+  if (typeof storedSettings === "string") {
+    try {
+      return JSON.parse(storedSettings) || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  return typeof storedSettings === "object" ? storedSettings : {};
+}
+
+function getSavedSettings(defaultLanguage) {
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    const language = translations[stored.language] ? stored.language : fallback.language;
-    const theme = ["auto", "dark", "light"].includes(stored.theme) ? stored.theme : fallback.theme;
-    return {
-      language,
-      theme,
-      silenceThreshold: clampNumber(Number(stored.silenceThreshold ?? fallback.silenceThreshold), 0.005, 0.08),
-      minSilenceSeconds: clampNumber(Number(stored.minSilenceSeconds ?? fallback.minSilenceSeconds), 1, 30),
-      minAudibleSeconds: clampNumber(Number(stored.minAudibleSeconds ?? fallback.minAudibleSeconds), 0.1, 3),
-    };
+    return normalizeStoredSettings(localStorage.getItem(STORAGE_KEY), defaultLanguage);
   } catch (error) {
-    return fallback;
+    return normalizeStoredSettings({}, defaultLanguage);
   }
 }
 
-function persistSettings() {
+function getSettingsPayload() {
+  return {
+    language: state.language,
+    theme: state.settings.theme,
+    silenceThreshold: state.settings.silenceThreshold,
+    minSilenceSeconds: state.settings.minSilenceSeconds,
+    minAudibleSeconds: state.settings.minAudibleSeconds,
+  };
+}
+
+function getExtensionStorageArea() {
+  return globalThis.browser?.storage?.local || globalThis.chrome?.storage?.local || null;
+}
+
+function getExtensionStorageError() {
+  return globalThis.chrome?.runtime?.lastError || null;
+}
+
+function readExtensionSettings() {
+  const storage = getExtensionStorageArea();
+  if (!storage?.get) {
+    return Promise.resolve(null);
+  }
+
+  if (globalThis.browser?.storage?.local === storage) {
+    return storage
+      .get(STORAGE_KEY)
+      .then((result) => result?.[STORAGE_KEY] || null)
+      .catch(() => null);
+  }
+
+  return new Promise((resolve) => {
+    try {
+      storage.get(STORAGE_KEY, (result) => {
+        if (getExtensionStorageError()) {
+          resolve(null);
+          return;
+        }
+        resolve(result?.[STORAGE_KEY] || null);
+      });
+    } catch (error) {
+      resolve(null);
+    }
+  });
+}
+
+function writeExtensionSettings(payload) {
+  const storage = getExtensionStorageArea();
+  if (!storage?.set) {
+    return;
+  }
+
+  try {
+    const writeResult = storage.set({ [STORAGE_KEY]: payload }, () => {});
+    if (writeResult?.catch) {
+      writeResult.catch(() => {});
+    }
+  } catch (error) {
+    try {
+      const writeResult = storage.set({ [STORAGE_KEY]: payload });
+      if (writeResult?.catch) {
+        writeResult.catch(() => {});
+      }
+    } catch (innerError) {
+      // Extension storage can be unavailable without the storage permission.
+    }
+  }
+}
+
+function applySavedSettings(settings) {
+  state.language = settings.language;
+  state.settings = {
+    theme: settings.theme,
+    silenceThreshold: settings.silenceThreshold,
+    minSilenceSeconds: settings.minSilenceSeconds,
+    minAudibleSeconds: settings.minAudibleSeconds,
+  };
+  setLanguage(settings.language, false);
+  applyTheme();
+  syncSettingsControls();
+  applyLanguage();
+  reanalyzeSilenceSettings();
+}
+
+async function hydratePersistentSettings() {
+  const stored = await readExtensionSettings();
+  state.settingsStorageHydrated = true;
+
+  if (state.settingsChangedBeforeHydration) {
+    return;
+  }
+
+  if (!stored) {
+    persistSettings({ markDirty: false });
+    return;
+  }
+
+  applySavedSettings(normalizeStoredSettings(stored, getLanguagePreference().language));
+}
+
+function persistSettings({ markDirty = true } = {}) {
+  if (markDirty && !state.settingsStorageHydrated) {
+    state.settingsChangedBeforeHydration = true;
+  }
+
+  const payload = getSettingsPayload();
   try {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({
-        language: state.language,
-        theme: state.settings.theme,
-        silenceThreshold: state.settings.silenceThreshold,
-        minSilenceSeconds: state.settings.minSilenceSeconds,
-        minAudibleSeconds: state.settings.minAudibleSeconds,
-      }),
+      JSON.stringify(payload),
     );
   } catch (error) {
     // Storage can be unavailable in restrictive browser contexts.
   }
+
+  writeExtensionSettings(payload);
 }
 
 function applyLanguage() {
