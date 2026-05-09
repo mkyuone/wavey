@@ -1359,7 +1359,7 @@ const STT_DB_VERSION = 1;
 const STT_MODEL = {
   id: "whisper-tiny-multilingual",
   version: "ggml-tiny-main-20250902",
-  url: "https://sf.mkyu.one/models/whisper/ggml-tiny.bin",
+  url: "https://proj-assets.mkyu.one/markyuone/audionavi/models/whisper/ggml-tiny.bin",
   expectedBytes: 77691713,
   sha256: "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
 };
