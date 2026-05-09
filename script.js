@@ -63,10 +63,7 @@ const transcriptionLanguageControl = document.querySelector("#transcriptionLangu
 const transcriptionLanguageValue = document.querySelector(".transcription-language-value");
 const transcriptionLanguageMenu = document.querySelector("#transcriptionLanguageMenu");
 const transcriptionLanguageOptions = [...document.querySelectorAll("#transcriptionLanguageMenu [role='option']")];
-const sttWebGpuState = document.querySelector("#sttWebGpuState");
-const sttModelState = document.querySelector("#sttModelState");
 const sttModelStateText = document.querySelector("#sttModelStateText");
-const sttStateList = document.querySelector(".stt-state-list");
 const sttModelActions = document.querySelector("#sttModelActions");
 const downloadModelButton = document.querySelector("#downloadModelButton");
 const sttSettingsStatus = document.querySelector("#sttSettingsStatus");
@@ -166,6 +163,9 @@ const translations = {
     sttModelDownloaded: "Model downloaded",
     sttModelNotDownloaded: "Model not downloaded",
     sttUnsupportedMessage: "Transcription is not supported on this device/browser.",
+    sttExtensionUnsupportedMessage: "Transcription is not available in the Chrome extension yet because this local Whisper runtime uses JavaScript eval, which Chrome extensions block.",
+    downloadingModelTitle: "Downloading model",
+    verifyingModelTitle: "Verifying model",
     transcribe: "Transcribe",
     transcript: "Transcript",
     subtitles: "Subtitles",
@@ -834,6 +834,9 @@ const sttTranslations = {
     sttModelDownloaded: "Modelo descargado",
     sttModelNotDownloaded: "Modelo no descargado",
     sttUnsupportedMessage: "La transcripción no es compatible con este dispositivo o navegador.",
+    sttExtensionUnsupportedMessage: "La transcripción aún no está disponible en la extensión de Chrome porque este runtime local de Whisper usa JavaScript eval, que Chrome bloquea en extensiones.",
+    downloadingModelTitle: "Descargando modelo",
+    verifyingModelTitle: "Verificando modelo",
     transcribe: "Transcribir",
     transcript: "Transcripción",
     subtitles: "Subtítulos",
@@ -879,6 +882,9 @@ const sttTranslations = {
     sttModelDownloaded: "Modèle téléchargé",
     sttModelNotDownloaded: "Modèle non téléchargé",
     sttUnsupportedMessage: "La transcription n’est pas prise en charge sur cet appareil ou navigateur.",
+    sttExtensionUnsupportedMessage: "La transcription n’est pas encore disponible dans l’extension Chrome, car ce runtime Whisper local utilise JavaScript eval, bloqué par Chrome dans les extensions.",
+    downloadingModelTitle: "Téléchargement du modèle",
+    verifyingModelTitle: "Vérification du modèle",
     transcribe: "Transcrire",
     transcript: "Transcription",
     subtitles: "Sous-titres",
@@ -924,6 +930,9 @@ const sttTranslations = {
     sttModelDownloaded: "Modell heruntergeladen",
     sttModelNotDownloaded: "Modell nicht heruntergeladen",
     sttUnsupportedMessage: "Transkription wird auf diesem Gerät oder Browser nicht unterstützt.",
+    sttExtensionUnsupportedMessage: "Transkription ist in der Chrome-Erweiterung noch nicht verfügbar, weil diese lokale Whisper-Laufzeit JavaScript eval verwendet, das Chrome in Erweiterungen blockiert.",
+    downloadingModelTitle: "Modell wird heruntergeladen",
+    verifyingModelTitle: "Modell wird geprüft",
     transcribe: "Transkribieren",
     transcript: "Transkript",
     subtitles: "Untertitel",
@@ -969,6 +978,9 @@ const sttTranslations = {
     sttModelDownloaded: "Modelo baixado",
     sttModelNotDownloaded: "Modelo não baixado",
     sttUnsupportedMessage: "A transcrição não é compatível com este dispositivo ou navegador.",
+    sttExtensionUnsupportedMessage: "A transcrição ainda não está disponível na extensão do Chrome porque este runtime local do Whisper usa JavaScript eval, que o Chrome bloqueia em extensões.",
+    downloadingModelTitle: "Baixando modelo",
+    verifyingModelTitle: "Verificando modelo",
     transcribe: "Transcrever",
     transcript: "Transcrição",
     subtitles: "Legendas",
@@ -1014,6 +1026,9 @@ const sttTranslations = {
     sttModelDownloaded: "Модель загружена",
     sttModelNotDownloaded: "Модель не загружена",
     sttUnsupportedMessage: "Транскрипция не поддерживается на этом устройстве или в этом браузере.",
+    sttExtensionUnsupportedMessage: "Транскрипция пока недоступна в расширении Chrome, потому что этот локальный runtime Whisper использует JavaScript eval, который Chrome блокирует в расширениях.",
+    downloadingModelTitle: "Загрузка модели",
+    verifyingModelTitle: "Проверка модели",
     transcribe: "Транскрибировать",
     transcript: "Транскрипт",
     subtitles: "Субтитры",
@@ -1059,6 +1074,9 @@ const sttTranslations = {
     sttModelDownloaded: "मॉडल डाउनलोड हो गया",
     sttModelNotDownloaded: "मॉडल डाउनलोड नहीं हुआ",
     sttUnsupportedMessage: "इस डिवाइस या ब्राउज़र पर ट्रांसक्रिप्शन समर्थित नहीं है।",
+    sttExtensionUnsupportedMessage: "Chrome extension में ट्रांसक्रिप्शन अभी उपलब्ध नहीं है क्योंकि यह local Whisper runtime JavaScript eval उपयोग करता है, जिसे Chrome extensions में ब्लॉक करता है।",
+    downloadingModelTitle: "मॉडल डाउनलोड हो रहा है",
+    verifyingModelTitle: "मॉडल सत्यापित हो रहा है",
     transcribe: "ट्रांसक्राइब",
     transcript: "ट्रांसक्रिप्ट",
     subtitles: "सबटाइटल",
@@ -1104,6 +1122,9 @@ const sttTranslations = {
     sttModelDownloaded: "モデルはダウンロード済み",
     sttModelNotDownloaded: "モデル未ダウンロード",
     sttUnsupportedMessage: "このデバイスまたはブラウザでは文字起こしを利用できません。",
+    sttExtensionUnsupportedMessage: "このローカル Whisper ランタイムは Chrome 拡張機能でブロックされる JavaScript eval を使うため、拡張機能では文字起こしをまだ利用できません。",
+    downloadingModelTitle: "モデルをダウンロード中",
+    verifyingModelTitle: "モデルを検証中",
     transcribe: "文字起こし",
     transcript: "文字起こし",
     subtitles: "字幕",
@@ -1149,6 +1170,9 @@ const sttTranslations = {
     sttModelDownloaded: "모델 다운로드됨",
     sttModelNotDownloaded: "모델 다운로드 안 됨",
     sttUnsupportedMessage: "이 기기 또는 브라우저에서는 전사를 지원하지 않습니다.",
+    sttExtensionUnsupportedMessage: "이 로컬 Whisper 런타임이 Chrome 확장 프로그램에서 차단되는 JavaScript eval을 사용하므로 확장 프로그램에서는 아직 전사를 사용할 수 없습니다.",
+    downloadingModelTitle: "모델 다운로드 중",
+    verifyingModelTitle: "모델 확인 중",
     transcribe: "전사",
     transcript: "전사문",
     subtitles: "자막",
@@ -1194,6 +1218,9 @@ const sttTranslations = {
     sttModelDownloaded: "模型已下载",
     sttModelNotDownloaded: "模型未下载",
     sttUnsupportedMessage: "此设备或浏览器不支持转录。",
+    sttExtensionUnsupportedMessage: "Chrome 扩展暂不支持转录，因为这个本地 Whisper 运行时使用 JavaScript eval，而 Chrome 扩展会阻止它。",
+    downloadingModelTitle: "正在下载模型",
+    verifyingModelTitle: "正在验证模型",
     transcribe: "转录",
     transcript: "转录文本",
     subtitles: "字幕",
@@ -1239,6 +1266,9 @@ const sttTranslations = {
     sttModelDownloaded: "模型已下載",
     sttModelNotDownloaded: "模型未下載",
     sttUnsupportedMessage: "此裝置或瀏覽器不支援轉錄。",
+    sttExtensionUnsupportedMessage: "Chrome 擴充功能暫不支援轉錄，因為這個本機 Whisper 執行環境使用 JavaScript eval，而 Chrome 擴充功能會阻止它。",
+    downloadingModelTitle: "正在下載模型",
+    verifyingModelTitle: "正在驗證模型",
     transcribe: "轉錄",
     transcript: "轉錄文字",
     subtitles: "字幕",
@@ -1359,7 +1389,7 @@ const STT_DB_VERSION = 1;
 const STT_MODEL = {
   id: "whisper-tiny-multilingual",
   version: "ggml-tiny-main-20250902",
-  url: "https://proj-assets.mkyu.one/markyuone/audionavi/models/whisper/ggml-tiny.bin",
+  url: "https://proj-assets.mkyu.one/markyuone/audionavi/models/whisper/ggml-tiny.bin?v=ggml-tiny-main-20260509",
   expectedBytes: 77691713,
   sha256: "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
 };
@@ -1377,6 +1407,7 @@ const STT_LANGUAGE_BY_APP_LANGUAGE = {
   "zh-CN": "zh",
   "zh-TW": "zh",
 };
+const STT_RUNTIME_USES_UNSAFE_EVAL = true;
 const SUPPORTED_AUDIO_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "oga", "ogg", "opus", "wav", "weba"]);
 const SUPPORTED_VIDEO_EXTENSIONS = new Set(["avi", "m4v", "mkv", "mov", "mp4", "webm"]);
 const RECORDED_AUDIO_MIME_TYPES = [
@@ -2860,10 +2891,12 @@ function checkSttCapability() {
   const hasWorker = typeof Worker !== "undefined";
   const hasIndexedDb = typeof indexedDB !== "undefined";
   const hasSharedArrayBuffer = typeof SharedArrayBuffer !== "undefined";
+  const isExtensionPage = location.protocol === "chrome-extension:";
+  const runtimeAllowed = !(isExtensionPage && STT_RUNTIME_USES_UNSAFE_EVAL);
   state.sttCapability = {
     checked: true,
-    isSupported: isChromeLike && hasWebGpu && hasWorker && hasIndexedDb && hasSharedArrayBuffer,
-    reason: hasWebGpu ? "" : "webgpu",
+    isSupported: isChromeLike && hasWebGpu && hasWorker && hasIndexedDb && hasSharedArrayBuffer && runtimeAllowed,
+    reason: runtimeAllowed ? (hasWebGpu ? "" : "webgpu") : "extension-csp",
   };
   checkStoredModel().catch(() => {
     state.sttModelInfo = { checked: true, isDownloaded: false };
@@ -2909,10 +2942,16 @@ function syncTranscriptionUi() {
   configRows.forEach((row, index) => {
     row.classList.toggle("is-hidden", !isSupported || (index > 0 && !hasModel));
   });
-  sttStateList.classList.add("is-hidden");
   sttModelActions.classList.toggle("is-hidden", !isSupported || hasModel);
   downloadModelButton.disabled = !isSupported || hasModel || state.sttIsRunning;
   sttUnsupportedMessage.classList.toggle("is-hidden", isSupported);
+  if (!isSupported) {
+    sttUnsupportedMessage.textContent = translate(
+      state.sttCapability.reason === "extension-csp"
+        ? "sttExtensionUnsupportedMessage"
+        : "sttUnsupportedMessage",
+    );
+  }
   transcribeButton.classList.toggle("is-hidden", !(enabledAndSupported && hasFile && !state.sttIsRunning));
   transcriptButton.classList.toggle("is-hidden", !(state.settings.transcriptionEnabled && hasTranscript));
   subtitleButton.classList.toggle("is-hidden", !(state.settings.transcriptionEnabled && hasTranscript));
@@ -2921,21 +2960,14 @@ function syncTranscriptionUi() {
     !(state.settings.transcriptionEnabled && (state.sttStatusKey || hasTranscript || state.sttIsRunning)),
   );
 
-  sttWebGpuState.textContent = translate(state.sttCapability.isSupported ? "sttWebGpuSupported" : "sttWebGpuUnsupported");
-  sttWebGpuState.classList.toggle("is-good", state.sttCapability.isSupported);
-  sttModelState.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
-  sttModelState.classList.toggle("is-good", state.sttModelInfo.isDownloaded);
   sttModelStateText.textContent = translate(state.sttModelInfo.isDownloaded ? "sttModelDownloaded" : "sttModelNotDownloaded");
 
   if (state.sttStatusKey) {
     transcriptStatus.textContent = translate(state.sttStatusKey, state.sttStatusParams);
-    sttSettingsStatus.textContent = translate(state.sttStatusKey, state.sttStatusParams);
   } else if (hasTranscript) {
     transcriptStatus.textContent = translate("transcriptReady");
   }
   transcriptStatus.classList.toggle("is-error", state.sttStatusKey === "sttFailed" || state.sttStatusKey === "sttModelUnavailable");
-  sttSettingsStatus.classList.toggle("is-hidden", !state.sttStatusKey || !isSupported || hasModel);
-  sttSettingsStatus.classList.toggle("is-error", state.sttStatusKey === "sttFailed" || state.sttStatusKey === "sttModelUnavailable");
 
   if (!state.settings.transcriptionEnabled) {
     hideSubtitles();
@@ -3015,6 +3047,9 @@ async function startTranscription() {
     console.error(error);
     const key = /model/i.test(error?.message || "") ? "sttModelUnavailable" : "sttFailed";
     setTranscriptStatus(key, {}, true);
+    if (key === "sttFailed" && error?.message) {
+      transcriptStatus.textContent = `${translate("sttFailed")} ${getReadableTranscriptionError(error.message)}`;
+    }
   } finally {
     state.sttIsRunning = false;
     syncTranscriptionUi();
@@ -3027,14 +3062,18 @@ async function downloadAndStoreSttModel() {
   }
 
   state.sttIsRunning = true;
-  setTranscriptStatus("sttPreparing");
+  setBusy(true, "downloadingModelTitle", "sttPreparing", {}, null);
   syncTranscriptionUi();
   try {
     await ensureSttModel();
     state.sttStatusKey = "";
     state.sttStatusParams = {};
+  } catch (error) {
+    setTranscriptStatus("sttModelUnavailable", {}, true);
+    throw error;
   } finally {
     state.sttIsRunning = false;
+    setBusy(false);
     syncTranscriptionUi();
   }
 }
@@ -3048,7 +3087,7 @@ async function ensureSttModel() {
   }
 
   const bytes = await downloadSttModel();
-  setTranscriptStatus("sttVerifyingModel");
+  setBusy(true, "verifyingModelTitle", "sttVerifyingModel", {}, 100);
   await nextPaint();
   const sha256 = await sha256ArrayBuffer(bytes.buffer);
   if (bytes.byteLength !== STT_MODEL.expectedBytes || sha256 !== STT_MODEL.sha256) {
@@ -3093,9 +3132,15 @@ async function downloadSttModel() {
     chunks.push(value);
     loaded += value.byteLength;
     if (declaredSize) {
-      setTranscriptStatus("sttDownloadingModel", { loaded: formatMegabytes(loaded), total: formatMegabytes(declaredSize) });
+      setBusy(
+        true,
+        "downloadingModelTitle",
+        "sttDownloadingModel",
+        { loaded: formatMegabytes(loaded), total: formatMegabytes(declaredSize) },
+        (loaded / declaredSize) * 100,
+      );
     } else {
-      setTranscriptStatus("sttDownloadUnknown", { loaded: formatMegabytes(loaded) });
+      setBusy(true, "downloadingModelTitle", "sttDownloadUnknown", { loaded: formatMegabytes(loaded) }, null);
     }
   }
 
@@ -3301,9 +3346,20 @@ function setTranscriptStatus(key, params = {}, isError = false) {
   transcriptStatus.textContent = translate(key, params);
   transcriptStatus.classList.toggle("is-error", isError);
   transcriptStatus.classList.remove("is-hidden");
-  sttSettingsStatus.textContent = translate(key, params);
-  sttSettingsStatus.classList.toggle("is-error", isError);
-  sttSettingsStatus.classList.remove("is-hidden");
+}
+
+function getReadableTranscriptionError(message) {
+  const firstLine = String(message).split("\n").find(Boolean) || "";
+  if (/worker-src|Content Security Policy|CSP/i.test(firstLine)) {
+    return "The local Whisper worker was blocked by the extension policy.";
+  }
+  if (/SharedArrayBuffer|bad memory|WebAssembly threads/i.test(firstLine)) {
+    return "Shared memory is unavailable in this browser context.";
+  }
+  if (/unknown language/i.test(message)) {
+    return "The selected transcription language is not supported by this runtime.";
+  }
+  return firstLine ? `(${firstLine})` : "";
 }
 
 function normalizeTranscriptSegments(segments, chunkStart, chunkEnd, language) {

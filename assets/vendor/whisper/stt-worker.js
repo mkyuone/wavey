@@ -27,10 +27,12 @@ self.addEventListener("message", async (event) => {
 
     throw new Error(`Unsupported STT worker message: ${type}`);
   } catch (error) {
+    const logs = activeLogBuffer ? activeLogBuffer.slice(-12) : [];
+    activeLogBuffer = null;
     postMessage({
       id,
       type: "error",
-      message: error?.message || "Transcription failed.",
+      message: [error?.message || "Transcription failed.", ...logs].filter(Boolean).join("\n"),
     });
   }
 });
