@@ -165,6 +165,9 @@ async function ensureAudioGraph() {
     await state.audioContext.resume();
   }
 
+  if (typeof ensureAdvancedSoundNode === "function") {
+    await ensureAdvancedSoundNode();
+  }
   updateOutputGain();
 }
 
@@ -176,9 +179,10 @@ async function ensureMediaElementAudioGraph() {
   await ensureAudioGraph();
   if (!state.mediaElementSource) {
     state.mediaElementSource = state.audioContext.createMediaElementSource(state.mediaElement);
-    state.mediaElementSource.connect(state.gainNode);
+    connectPlaybackSourceNode(state.mediaElementSource);
   }
   state.mediaElement.volume = 1;
+  syncMediaElementPitchHandling();
   updateOutputGain();
   return true;
 }
@@ -268,7 +272,7 @@ function startAudioSource() {
   const source = state.audioContext.createBufferSource();
   source.buffer = state.audioBuffer;
   source.playbackRate.value = state.playbackRate;
-  source.connect(state.gainNode);
+  connectPlaybackSourceNode(source);
   source.addEventListener("ended", () => {
     if (state.audioSource !== source || !state.isPlaying) {
       return;
@@ -296,6 +300,17 @@ function stopAudioSource() {
     source.stop();
   } catch (error) {
     // Already stopped sources can throw in some browsers.
+  }
+}
+
+function getPlaybackEffectsInputNode() {
+  return state.soundTouchNode || state.gainNode;
+}
+
+function connectPlaybackSourceNode(source) {
+  const inputNode = getPlaybackEffectsInputNode();
+  if (inputNode) {
+    source.connect(inputNode);
   }
 }
 
@@ -413,22 +428,33 @@ function createBoostCurve(volumeGain) {
 }
 
 function updatePlaybackSpeed() {
-  const speed = Number(speedSlider.value);
+  setPlaybackSpeed(Number(speedSlider.value));
+}
+
+function setPlaybackSpeed(speed, { syncSlider = true } = {}) {
+  const min = Number(speedSlider.min);
+  const max = Number(speedSlider.max);
+  const nextSpeed = clampNumber(speed, min, max);
   if (state.isPlaying) {
     state.playbackOffset = getCurrentTime();
     state.playbackStartedAt = state.audioContext?.currentTime || 0;
   }
 
-  state.playbackRate = speed;
+  state.playbackRate = nextSpeed;
+  if (syncSlider) {
+    speedSlider.value = String(nextSpeed);
+  }
   if (state.audioSource) {
-    state.audioSource.playbackRate.value = speed;
+    state.audioSource.playbackRate.value = nextSpeed;
   }
   if (state.mediaElement) {
-    state.mediaElement.playbackRate = speed;
+    state.mediaElement.playbackRate = nextSpeed;
   }
 
-  speedValue.textContent = `${speed.toFixed(2)}x`;
+  updateAdvancedSoundNodeParameters();
+  speedValue.textContent = `${nextSpeed.toFixed(2)}x`;
   updateRangeFill(speedSlider);
+  syncAdvancedSoundUi();
 }
 
 function hasLoadedMedia() {
@@ -453,6 +479,7 @@ async function startMediaElement() {
   }
 
   element.playbackRate = state.playbackRate;
+  syncMediaElementPitchHandling();
 
   try {
     await waitForPlaybackMediaMetadata(element);

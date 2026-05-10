@@ -603,6 +603,9 @@ function updateAppViewport() {
   setAppHeightVariable();
   scheduleResizeCanvas();
   scheduleViewportWarningSync();
+  if (typeof constrainAdvancedSoundUi === "function") {
+    constrainAdvancedSoundUi();
+  }
 }
 
 function scheduleViewportWarningSync() {

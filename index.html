@@ -63,6 +63,40 @@
           </div>
         </div>
 
+        <section id="advancedSoundPanel" class="advanced-sound-panel is-hidden" aria-label="Advanced sound controls" data-i18n-aria="advancedSoundControls">
+          <div class="advanced-sound-header" data-advanced-sound-handle>
+            <span class="material-symbols-sharp ui-icon drag-icon" aria-hidden="true">drag_indicator</span>
+            <div class="advanced-sound-readouts">
+              <output id="advancedSpeedValue" for="advancedSoundPad">1.00x</output>
+              <output id="advancedPitchValue" for="advancedSoundPad">+0 st</output>
+            </div>
+            <button id="advancedSoundMinimize" type="button" class="icon-button" aria-label="Minimize advanced sound controls" data-i18n-aria="minimizeAdvancedSoundControls">
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">remove</span>
+            </button>
+            <button id="advancedSoundClose" type="button" class="icon-button" aria-label="Close advanced sound controls" data-i18n-aria="closeAdvancedSoundControls">
+              <span class="material-symbols-sharp ui-icon" aria-hidden="true">close</span>
+            </button>
+          </div>
+          <div id="advancedSoundPad" class="advanced-sound-pad" role="application" aria-label="Speed and pitch pad" data-i18n-aria="soundControlPad">
+            <span class="pad-axis pad-axis-x" aria-hidden="true"></span>
+            <span class="pad-axis pad-axis-y" aria-hidden="true"></span>
+            <button id="advancedSoundDot" type="button" class="advanced-sound-dot" aria-label="Speed and pitch position" data-i18n-aria="soundControlDot"></button>
+          </div>
+          <div class="advanced-sound-footer">
+            <span class="advanced-sound-axis-label" data-i18n="speed">Speed</span>
+            <button id="advancedSoundReset" type="button" class="secondary-button" data-i18n="resetSoundControls">Reset</button>
+            <span class="advanced-sound-axis-label" data-i18n="pitch">Pitch</span>
+          </div>
+          <p id="advancedSoundUnsupported" class="advanced-sound-unsupported is-hidden" data-i18n="advancedSoundUnsupported">
+            Pitch controls are not supported in this browser.
+          </p>
+        </section>
+
+        <button id="advancedSoundChip" type="button" class="advanced-sound-chip is-hidden" aria-label="Advanced sound controls" data-i18n-aria="advancedSoundControls">
+          <span class="material-symbols-sharp ui-icon" aria-hidden="true">tune</span>
+          <span id="advancedSoundChipValue">1.00x / +0 st</span>
+        </button>
+
         <div class="time-row">
           <span id="currentTime">0:00</span>
           <input id="timeline" type="range" min="0" max="1000" value="0" aria-label="Playback position" data-i18n-aria="playbackPosition">
@@ -117,14 +151,19 @@
                 <input id="volumeSlider" type="range" min="0" max="300" step="10" value="100" data-i18n-aria="volume">
                 <output id="volumeValue" for="volumeSlider">100%</output>
               </div>
-              <label class="speed-control">
-                <span class="control-label">
-                  <span class="material-symbols-sharp ui-icon" aria-hidden="true">speed</span>
-                  <span class="sr-only" data-i18n="speed">Speed</span>
-                </span>
-                <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" data-i18n-aria="speed">
-                <output id="speedValue" for="speedSlider">1.00x</output>
-              </label>
+              <div class="speed-control-group">
+                <label class="speed-control">
+                  <span class="control-label">
+                    <span class="material-symbols-sharp ui-icon" aria-hidden="true">speed</span>
+                    <span class="sr-only" data-i18n="speed">Speed</span>
+                  </span>
+                  <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" data-i18n-aria="speed">
+                  <output id="speedValue" for="speedSlider">1.00x</output>
+                </label>
+                <button id="advancedSoundButton" type="button" class="advanced-sound-button icon-button" aria-label="Advanced sound controls" data-i18n-aria="advancedSoundControls">
+                  <span class="material-symbols-sharp ui-icon" aria-hidden="true">tune</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -478,6 +517,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.</pre>
           </section>
+          <section class="license-section" aria-labelledby="soundTouchLicenseTitle">
+            <h3 id="soundTouchLicenseTitle" data-i18n="soundTouchLicense">SoundTouchJS Audio Worklet</h3>
+            <p data-i18n="soundTouchLicenseSummary">
+              SoundTouchJS Audio Worklet is bundled locally for pitch and tempo controls and is licensed under the GNU Lesser General Public License, Version 2.1.
+            </p>
+            <pre>SoundTouch JS audio processing library
+Copyright (c) Steve 'Cutter' Blades
+
+Bundled package: @soundtouchjs/audio-worklet
+Bundled source and license files: vendor/soundtouchjs-audio-worklet/
+Source package: https://www.npmjs.com/package/@soundtouchjs/audio-worklet
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+
+The full LGPL-2.1 license text is included in vendor/soundtouchjs-audio-worklet/LICENSE.</pre>
+          </section>
         </div>
       </section>
       <button id="licenseClose" type="button" class="settings-close icon-button" aria-label="Close licenses" data-i18n-aria="closeLicenses">
@@ -501,6 +556,7 @@ permissions and limitations under the License.</pre>
     <script src="app/playback.js"></script>
     <script src="app/settings-i18n.js"></script>
     <script src="app/pwa-updates.js"></script>
+    <script src="app/advanced-sound.js"></script>
     <script src="app/events.js"></script>
   </body>
 </html>

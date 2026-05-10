@@ -517,6 +517,7 @@ body:has(.viewport-warning:not(.is-hidden)) {
 }
 
 .player-panel {
+  position: relative;
   display: grid;
   gap: 18px;
   padding: 18px;
@@ -662,6 +663,181 @@ canvas {
 
 .waveform-seek-hint .ui-icon {
   color: var(--accent);
+}
+
+.advanced-sound-panel,
+.advanced-sound-chip {
+  position: absolute;
+  z-index: 7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 10px 30px var(--panel-shadow);
+}
+
+.advanced-sound-panel {
+  width: min(236px, calc(100% - 24px));
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.advanced-sound-panel.is-hidden,
+.advanced-sound-chip.is-hidden {
+  display: none;
+}
+
+.advanced-sound-header {
+  min-height: 32px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 32px 32px;
+  align-items: center;
+  gap: 6px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.advanced-sound-header:active {
+  cursor: grabbing;
+}
+
+.advanced-sound-header .drag-icon {
+  color: var(--muted);
+  font-size: 1.15rem;
+}
+
+.advanced-sound-header button {
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+}
+
+.advanced-sound-header button:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+
+.advanced-sound-readouts {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.advanced-sound-readouts output {
+  min-width: 48px;
+}
+
+.advanced-sound-pad {
+  position: relative;
+  height: 132px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(to right, var(--line) 1px, transparent 1px) 50% 0 / 33.333% 100%,
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px) 0 50% / 100% 33.333%,
+    var(--surface-soft);
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.advanced-sound-pad.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.pad-axis {
+  position: absolute;
+  pointer-events: none;
+  background: var(--hover-line);
+}
+
+.pad-axis-x {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+
+.pad-axis-y {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.advanced-sound-dot {
+  position: absolute;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-strong);
+  transform: translate(-50%, -50%);
+  touch-action: none;
+}
+
+.advanced-sound-dot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.advanced-sound-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.advanced-sound-footer button {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 0.86rem;
+}
+
+.advanced-sound-axis-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.advanced-sound-axis-label:last-child {
+  text-align: right;
+}
+
+.advanced-sound-unsupported {
+  margin: 0;
+  color: var(--warn);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.advanced-sound-chip {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.advanced-sound-chip:hover {
+  background: var(--surface-hover);
+}
+
+.advanced-sound-chip .ui-icon {
+  font-size: 1rem;
 }
 
 @media (min-height: 520px) {
@@ -1019,6 +1195,13 @@ input[type="range"]:focus::-moz-range-thumb {
   gap: 8px;
 }
 
+.speed-control-group {
+  min-width: 0;
+  flex: 1 1 0;
+  display: flex;
+  gap: 8px;
+}
+
 .speed-control,
 .volume-control {
   display: flex;
@@ -1073,6 +1256,28 @@ input[type="range"]:focus::-moz-range-thumb {
 .speed-control {
   min-width: 0;
   flex: 1 1 0;
+}
+
+.advanced-sound-button {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.advanced-sound-button.is-hidden {
+  display: none;
+}
+
+.advanced-sound-button:hover {
+  background: var(--surface-hover);
+}
+
+.advanced-sound-button:disabled {
+  color: var(--muted);
+  cursor: wait;
 }
 
 .volume-control input,

@@ -26,6 +26,7 @@ INCLUDE_PATHS = [
     "pwa.webmanifest",
     "service-worker.js",
     "styles.css",
+    "vendor",
 ]
 
 

@@ -10,7 +10,10 @@ const APP_SHELL = [
   "./app/playback.js",
   "./app/settings-i18n.js",
   "./app/pwa-updates.js",
+  "./app/advanced-sound.js",
   "./app/events.js",
+  "./vendor/soundtouchjs-audio-worklet/soundtouch-processor.js",
+  "./vendor/soundtouchjs-audio-worklet/LICENSE",
   "./pwa.webmanifest",
   "./favicon.ico",
   "./favicon.png",
@@ -107,6 +110,7 @@ async function networkFirst(request, fallbackUrl) {
 function isFreshnessCriticalRequest(request) {
   const { pathname } = new URL(request.url);
   return pathname.includes("/app/")
+    || pathname.includes("/vendor/")
     || pathname.endsWith("/styles.css")
     || pathname.endsWith("/pwa.webmanifest")
     || pathname.endsWith("/service-worker.js");

@@ -138,6 +138,10 @@ document.addEventListener("keydown", (event) => {
       closeSettings();
       return;
     }
+    if (state.advancedSoundOpen && !state.advancedSoundMinimized) {
+      closeAdvancedSoundPanel();
+      return;
+    }
     setJumpMenuOpen(false);
     setLanguageMenuOpen(false);
     if (document.activeElement?.closest(".jump-amount-wrap")) {
@@ -175,6 +179,20 @@ if ("launchQueue" in window) {
 }
 
 speedSlider.addEventListener("input", updatePlaybackSpeed);
+advancedSoundButton.addEventListener("click", openAdvancedSoundPanel);
+advancedSoundClose.addEventListener("click", closeAdvancedSoundPanel);
+advancedSoundMinimize.addEventListener("click", minimizeAdvancedSoundPanel);
+advancedSoundChip.addEventListener("click", restoreAdvancedSoundPanel);
+advancedSoundReset.addEventListener("click", resetAdvancedSoundControls);
+advancedSoundHandle.addEventListener("pointerdown", beginAdvancedSoundPanelDrag);
+advancedSoundHandle.addEventListener("pointermove", moveAdvancedSoundPanel);
+advancedSoundHandle.addEventListener("pointerup", endAdvancedSoundPanelDrag);
+advancedSoundHandle.addEventListener("pointercancel", endAdvancedSoundPanelDrag);
+advancedSoundPad.addEventListener("pointerdown", beginAdvancedSoundPadDrag);
+advancedSoundPad.addEventListener("pointermove", moveAdvancedSoundPad);
+advancedSoundPad.addEventListener("pointerup", endAdvancedSoundPadDrag);
+advancedSoundPad.addEventListener("pointercancel", endAdvancedSoundPadDrag);
+advancedSoundDot.addEventListener("keydown", handleAdvancedSoundDotKeydown);
 
 volumeSlider.addEventListener("input", updateOutputGain);
 nextAudio.addEventListener("click", seekToNextAudio);
@@ -233,6 +251,7 @@ if ("ResizeObserver" in window) {
   const layoutResizeObserver = new ResizeObserver(() => {
     scheduleResizeCanvas();
     scheduleViewportWarningSync();
+    constrainAdvancedSoundUi();
   });
   layoutResizeObserver.observe(appShell);
   layoutResizeObserver.observe(waveformWrap);
@@ -240,6 +259,7 @@ if ("ResizeObserver" in window) {
 applyTheme();
 syncSettingsControls();
 syncAppVersion();
+syncAdvancedSoundUi();
 setLanguage(state.language, false);
 applyLanguage();
 hydratePersistentSettings().catch(() => {
@@ -252,4 +272,6 @@ Object.assign(window.WaveyNavigator, {
   setTheme,
   drawWaveform,
   updateAppViewport,
+  setPlaybackSpeed,
+  setPitchSemitones,
 });

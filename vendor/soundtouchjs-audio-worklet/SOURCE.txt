@@ -1,0 +1,5 @@
+Package: @soundtouchjs/audio-worklet
+Version: 1.0.10
+Bundled files: soundtouch-processor.js, README.md, package.json, LICENSE
+Source package: https://www.npmjs.com/package/@soundtouchjs/audio-worklet
+Project: https://github.com/soundtouchjs/soundtouchjs
