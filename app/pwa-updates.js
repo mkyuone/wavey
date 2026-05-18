@@ -71,11 +71,14 @@ function forceRefreshAppShell() {
   window.location.replace(url.href);
 }
 
-function isPwaInstallContext() {
-  const isHttpApp = window.location.protocol === "https:"
+function isHttpAppContext() {
+  return window.location.protocol === "https:"
     || window.location.hostname === "localhost"
     || window.location.hostname === "127.0.0.1";
-  return isHttpApp && isChromiumBrowser() && !isInstalledPwaContext();
+}
+
+function isPwaInstallContext() {
+  return isHttpAppContext() && isChromiumBrowser() && !isInstalledPwaContext();
 }
 
 function isChromiumBrowser() {
@@ -95,18 +98,89 @@ function isInstalledPwaContext() {
     || displayModes.some((mode) => window.matchMedia?.(`(display-mode: ${mode})`).matches);
 }
 
+function canCheckInstalledRelatedPwa() {
+  return isHttpAppContext()
+    && !isInstalledPwaContext()
+    && typeof navigator.getInstalledRelatedApps === "function";
+}
+
+function isRelatedWaveyPwa(app) {
+  return app?.platform === "webapp";
+}
+
 function syncInstallButton() {
-  if (!isPwaInstallContext()) {
+  let mode = "hidden";
+
+  if (isInstalledPwaContext()) {
     state.deferredInstallPrompt = null;
+    state.hasInstalledRelatedPwa = false;
+  } else if (state.deferredInstallPrompt && isPwaInstallContext()) {
+    mode = "install";
+  } else if (state.hasInstalledRelatedPwa) {
+    mode = "open";
   }
 
-  installButton.classList.toggle(
-    "is-hidden",
-    !state.deferredInstallPrompt || !isPwaInstallContext(),
-  );
+  state.pwaInstallButtonMode = mode;
+  installButton.classList.toggle("is-hidden", mode === "hidden");
+
+  if (mode === "hidden") {
+    return;
+  }
+
+  const labelKey = mode === "open" ? "openInstalledApp" : "installApp";
+  const icon = installButton.querySelector(".ui-icon");
+  const label = installButton.querySelector("[data-i18n]");
+
+  installButton.dataset.i18nAria = labelKey;
+  installButton.setAttribute("aria-label", translate(labelKey));
+
+  if (icon) {
+    icon.textContent = mode === "open" ? "open_in_new" : "install_desktop";
+  }
+
+  if (label) {
+    label.dataset.i18n = labelKey;
+    label.textContent = translate(labelKey);
+  }
+}
+
+async function refreshPwaInstallState() {
+  const checkId = state.pwaInstallCheckId + 1;
+  state.pwaInstallCheckId = checkId;
+
+  if (!canCheckInstalledRelatedPwa()) {
+    state.hasInstalledRelatedPwa = false;
+    syncInstallButton();
+    return;
+  }
+
+  try {
+    const relatedApps = await navigator.getInstalledRelatedApps();
+    if (checkId !== state.pwaInstallCheckId) {
+      return;
+    }
+    state.hasInstalledRelatedPwa = relatedApps.some(isRelatedWaveyPwa);
+  } catch (error) {
+    if (checkId !== state.pwaInstallCheckId) {
+      return;
+    }
+    state.hasInstalledRelatedPwa = false;
+  }
+
+  syncInstallButton();
+}
+
+function openInstalledPwa() {
+  const appUrl = new URL(window.location.href);
+  window.open(appUrl.href, "_blank", "noopener,noreferrer");
 }
 
 async function promptPwaInstall() {
+  if (state.pwaInstallButtonMode === "open") {
+    openInstalledPwa();
+    return;
+  }
+
   if (!state.deferredInstallPrompt) {
     return;
   }
@@ -122,4 +196,6 @@ async function promptPwaInstall() {
   } catch (error) {
     console.warn("Wavey Audio Navigator install prompt was dismissed before a choice was returned.", error);
   }
+
+  refreshPwaInstallState();
 }
