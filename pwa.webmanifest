@@ -8,6 +8,13 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3D59F5",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "./pwa.webmanifest",
+      "id": "./"
+    }
+  ],
   "file_handlers": [
     {
       "action": "./",

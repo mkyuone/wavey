@@ -160,15 +160,17 @@ window.addEventListener("beforeinstallprompt", (event) => {
   }
 
   event.preventDefault();
+  state.hasInstalledRelatedPwa = false;
   state.deferredInstallPrompt = event;
   syncInstallButton();
 });
 
 window.addEventListener("appinstalled", () => {
   state.deferredInstallPrompt = null;
+  state.hasInstalledRelatedPwa = true;
   syncInstallButton();
 });
-window.addEventListener("pageshow", syncInstallButton);
+window.addEventListener("pageshow", refreshPwaInstallState);
 
 if ("launchQueue" in window) {
   window.launchQueue.setConsumer(handlePwaLaunchFiles);
