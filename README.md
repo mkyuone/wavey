@@ -1,6 +1,16 @@
 # Wavey Audio Navigator
 
-Project repo for Wavey Audio Navigator, a tiny static web app for opening an audio file locally, viewing an interactive waveform, and jumping through audible sections or silent gaps.
+A small local-first audio player for reviewing recordings with an interactive waveform, quick navigation controls, and silence-aware section jumps.
+
+![Wavey Audio Navigator waveform view](assets/screenshots/wavey-audio-navigator.png)
+
+## Features
+
+- Open common audio and video files locally; files are not uploaded.
+- Seek through an interactive waveform and jump by fixed time intervals.
+- Move between audible sections and inspect detected silence gaps.
+- Adjust speed, pitch, volume, theme, language, and silence detection settings.
+- Run as a static web app, install as a PWA, or load as a Chrome extension.
 
 ## Run
 
@@ -8,4 +18,4 @@ Open `index.html` in a browser, or serve the folder with any static file server.
 
 ## Chrome extension
 
-Load the project folder in Chrome from `chrome://extensions` with Developer Mode enabled. The packaged source archive is available at `dist/wavey-audio-navigator-chrome-extension.zip`; unzip it before using Chrome's "Load unpacked" flow. Clicking the extension toolbar button opens Wavey Audio Navigator in a full tab.
+Load the project folder in Chrome from `chrome://extensions` with Developer Mode enabled. To use the packaged source, unzip `dist/wavey-audio-navigator-1.1.0-chrome.zip` first, then load the extracted folder with Chrome's "Load unpacked" flow.
